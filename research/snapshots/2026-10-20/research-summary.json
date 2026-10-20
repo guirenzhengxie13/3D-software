@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-10-20",
+  "raw_observations": {
+    "frames": 11932,
+    "valid_depth_observations": 370243304,
+    "flattened_memory_estimates": {
+      "xyz_float32_bytes": 4442919648,
+      "xyz_float64_bytes": 8885839296,
+      "xyz_and_rgb_float64_bytes": 17771678592,
+      "xyz_rgb_normals_float64_bytes": 26657517888,
+      "xyz_f32_rgb_u8_scan_u32_frame_u64_pixel_u32_bytes": 11477542424
+    }
+  },
+  "latest_frames": 9434,
+  "latest_observations": 266838143,
+  "earlier_frames": 2498,
+  "earlier_observations": 103405161,
+  "latest_single_frame_quantiles": {
+    "min": 889.0,
+    "p25": 7661.0,
+    "median": 25143.0,
+    "p75": 35797.0,
+    "p90": 47422.70000000001,
+    "p95": 55714.4,
+    "max": 162754.0
+  },
+  "main_fused_surfaces": {
+    "models": 26,
+    "total_points": 2047250,
+    "point_quantiles": {
+      "min": 19321.0,
+      "p25": 39613.0,
+      "median": 54528.5,
+      "p75": 133962.25,
+      "p90": 148292.5,
+      "p95": 150855.25,
+      "max": 160815.0
+    }
+  },
+  "memory": {
+    "physical_ram_bytes": 16354062336,
+    "latest_dense_depth_float32_bytes": 18113280000,
+    "latest_array_estimates": {
+      "xyz_float32_bytes": 3202057716,
+      "xyz_float64_bytes": 6404115432,
+      "xyz_and_rgb_float64_bytes": 12808230864,
+      "xyz_rgb_normals_float64_bytes": 19212346296,
+      "xyz_f32_rgb_u8_scan_u32_frame_u64_pixel_u32_bytes": 8271982433
+    }
+  },
+  "verification": {
+    "python_tests_passed": 123,
+    "node_controls": [
+      "CPU depth raster and local PLY ASCII / little-endian / big-endian import",
+      "Studio controller and lazy iframe initialization",
+      "Original-ID picking and display exposure without changing source colors",
+      "Workbench import-fit-export and same-origin parent submission"
+    ],
+    "generated_workbench_pages": 6,
+    "nonempty_cpu_views": 18,
+    "http_integration": "http-integration-check.json",
+    "actual_browser_verified": false,
+    "actual_gpu_verified": false,
+    "known_remaining": [
+      "Chrome real rendering check",
+      "Generic arbitrary fragment alignment to original-frame fusion plan bridge",
+      "Persistent project undo history and Agent model service"
+    ]
+  },
+  "limitations": [
+    "Raw observations repeat the same physical surfaces and cannot be counted as unique geometry.",
+    "The figures and summaries are research evidence; original scans, decoded frames and full models are not included.",
+    "Actual Chrome/GPU rendering remains unverified; CPU pixel and HTTP checks are explicitly separate.",
+    "SDK/realtime and the generic correspondence-to-original-fragment-fusion bridge remain deferred or incomplete."
+  ]
+}

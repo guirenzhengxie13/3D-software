@@ -1,0 +1,44 @@
+[
+  {
+    "snapshot_file": "memory-budget.png",
+    "source_relative_path": "reports/pointcloud-scale-20261019/memory-budget.png",
+    "sha256": "89b6064860d6f5811aeaa67ad88402fd6b9de642a892eecb29bf4849da27d8f6",
+    "bytes": 65116
+  },
+  {
+    "snapshot_file": "preview-coverage.png",
+    "source_relative_path": "reports/pointcloud-scale-20261019/preview-coverage.png",
+    "sha256": "0731457686a0b20fec3699e77b57b0b6ec743e2962ffaab5536c2b0ad302c434",
+    "bytes": 264956
+  },
+  {
+    "snapshot_file": "official-and-own-color.png",
+    "source_relative_path": "reports/range2-study-20261018/color-comparison.png",
+    "sha256": "57ce46c18d9fa939688e0a139daefc4dcc155782ec4a5dc29cd86012130468ba",
+    "bytes": 248218
+  },
+  {
+    "snapshot_file": "all-main-reconstructions.png",
+    "source_relative_path": "reports/range2-study-20261018/reconstruction-overview.png",
+    "sha256": "8e69456cab3eac3eb8aa0410f447d3ed5b770a3b4542ff01f893950f8d48f570",
+    "bytes": 1110763
+  },
+  {
+    "snapshot_file": "direct-fragment-fusion.png",
+    "source_relative_path": "reports/range2-study-20261018/experiments/cup-direct-split/full-reconstruction/comparison.png",
+    "sha256": "16360a6294e6e468ff490b2a9552071eedf06505412d1e5e07b655135859cc1d",
+    "bytes": 286337
+  },
+  {
+    "snapshot_file": "two-scan-depth-fusion.png",
+    "source_relative_path": "reports/range2-study-20261018/experiments/cup-multi-scan-tsdf/comparison.png",
+    "sha256": "590f4529a639e43f6b0d886aae85f3504ebc086182df4ae8813d484bbaeef155",
+    "bytes": 347436
+  },
+  {
+    "snapshot_file": "workbench-cpu-raster.png",
+    "source_relative_path": "reports/web-studio/compatibility/workbench-canvas.png",
+    "sha256": "6d618a3556d0d8d0872c22258580bc9a3aebb3eedc69484cd738a65885481c67",
+    "bytes": 132625
+  }
+]

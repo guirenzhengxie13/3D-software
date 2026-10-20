@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>片段对应点配准</title>
+<style>
+.markers{z-index:3}.pane h2,.pane p,.legend{z-index:4}
+*{box-sizing:border-box}body{margin:0;background:#0c1420;color:#e3edf8;font:14px/1.65 system-ui,'Microsoft YaHei',sans-serif}header{height:76px;padding:14px 24px;border-bottom:1px solid #2b3d53;display:flex;justify-content:space-between;align-items:center}h1{font-size:22px;margin:0}small,.muted{color:#a5b9ce}main{display:flex;min-height:calc(100vh - 76px)}aside{width:295px;flex-shrink:0;padding:20px;border-right:1px solid #2b3d53}h2{font-size:15px;margin:20px 0 9px}h2:first-child{margin-top:0}p{margin:9px 0}select,button,input{font:inherit}select,button{color:#e3edf8;background:#1c2d43;border:1px solid #48627f;border-radius:7px;padding:8px 10px}select{width:100%}button{cursor:pointer}button:hover{background:#294460}button:disabled{opacity:.4;cursor:default}.primary{background:#346791;border-color:#7ba8ce}.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.full{width:100%;margin-top:9px}.small{font-size:12px}#status{padding:10px 12px;margin-top:12px;border-left:3px solid #8ab8e1;background:#17283b;min-height:65px}#metrics{font-variant-numeric:tabular-nums;white-space:pre-line;color:#c1d5e9}#pairs{max-height:255px;overflow:auto;padding-left:24px}#pairs li{padding:5px 0;font-size:12px}#pairs button{padding:1px 5px;margin-left:6px;font-size:11px}.views{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:1;min-width:0}.pane{position:relative;min-width:0;border-right:1px solid #2b3d53;background:radial-gradient(ellipse at center,#1a2a3c,#0c1420 75%)}.pane h2{position:absolute;top:13px;left:15px;margin:0;z-index:2;pointer-events:none}.pane p{position:absolute;top:37px;left:15px;right:12px;color:#9ab1c9;font-size:12px;pointer-events:none;z-index:2}.pane canvas{width:100%;height:calc(100vh - 77px);min-height:500px;display:block;touch-action:none;outline:none}.markers{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.error{position:absolute;top:35%;left:10%;right:10%;padding:15px;background:#422733;border:1px solid #b76e7d;display:none}.badge{border:1px solid #43617e;padding:4px 9px;border-radius:20px;font-size:12px;color:#aac7e5}.legend{position:absolute;bottom:15px;left:15px;font-size:12px;color:#b5c8da;pointer-events:none}.blue{color:#61c5ff}.orange{color:#ffbd71}#file{display:none}@media(max-width:1050px){.views{grid-template-columns:1fr}.pane canvas{height:420px;min-height:420px}aside{width:260px}header .badge{display:none}}@media(max-width:650px){main{display:block}aside{width:100%;border-right:0}header{height:auto}.views{display:block}}
+</style>
+<style>
+aside{height:calc(100vh - 76px);overflow:auto}.views{max-height:calc(100vh - 76px);overflow:auto}.pane{height:calc(100vh - 77px)}.markers{z-index:3}#modelFiles{max-height:155px;overflow:auto;font-size:11px}
+@media(max-width:1050px){.pane{height:420px}}@media(max-width:650px){aside{height:auto;max-height:420px}.views{max-height:none}.pane{height:420px}}
+</style>
+<header><div><h1>片段对应点配准</h1><small>选定对应位置 → 预览刚体对齐 → 导出独立变换</small></div><span class="badge">离线研究原型 · 原始模型不覆盖</span></header>
+<main>
+<aside>
+<p id="contextNote" class="small muted"></p>
+<h2>已载入模型</h2><div id="modelFiles" class="small" style="overflow-wrap:anywhere;color:#b8cce1">正在读取页面内嵌模型…</div>
+<h2>位置候选</h2><select id="candidate" aria-label="选择已有位置候选"></select>
+<div class="row"><button id="restore">恢复所选候选</button><button id="resetView">重置视角</button></div>
+<h2>选择同一位置</h2>
+<p class="small">先在左侧固定片段选一点，再在中间移动片段选择同一位置。重复至少三对，尽量选分散且有辨识力的位置。</p>
+<p class="small muted">按住 Alt 单击选点；普通拖动旋转，Shift 拖动平移，滚轮缩放。也可开启下方点选模式。</p>
+<label class="small"><input id="pickMode" type="checkbox"> 点选模式</label>
+<ol id="pairs"></ol>
+<div class="row"><button id="undoPair">撤销上一对</button><button id="clearPairs">清空选点</button></div>
+<button class="primary full" id="solve" disabled>计算刚体对齐</button>
+<div id="status" role="status" aria-live="polite">正在初始化点云。如果这里一直不变，请检查浏览器是否允许 JavaScript。</div>
+<noscript>本页面需要启用 JavaScript 才能显示点云。</noscript>
+<p id="metrics" class="small"></p>
+<h2>保存这次操作</h2>
+<button id="export" class="full">导出选点与变换 JSON</button>
+<button id="submitStudio" class="primary full" hidden>核对并另存对齐模型</button>
+<button id="import" class="full">载入之前的选点 JSON</button><input id="file" type="file" accept="application/json,.json">
+<p class="small muted">导出只保存模型引用、原点编号、对应关系和变换。后端会核对原文件，再生成新结果。</p>
+<h2>显示</h2><select id="colorMode"><option value="separate">叠加按片段着色</option><option value="rgb">叠加显示原顶点色</option></select>
+<label class="small">显示增亮 <input id="gain" type="range" min="1" max="4" step=".2" value="1.8" style="width:125px">（不改原颜色）</label>
+<button id="compatibility" class="full">切换兼容绘制（无需 WebGL）</button><p id="rendererStatus" class="small muted"></p>
+<p class="small muted" id="sampling"></p>
+</aside>
+<div class="views">
+<section class="pane"><h2>1 · 固定片段</h2><p>先在这里选点</p><canvas id="target" tabindex="0" aria-label="固定片段点云"></canvas><svg class="markers" id="targetMarkers"></svg><div class="error"></div><div class="legend">绿色标记：固定片段对应点</div></section>
+<section class="pane"><h2>2 · 移动片段</h2><p>在这里选择同一位置；保持原始坐标</p><canvas id="source" tabindex="0" aria-label="移动片段点云"></canvas><svg class="markers" id="sourceMarkers"></svg><div class="error"></div><div class="legend">橙色标记：移动片段对应点</div></section>
+<section class="pane"><h2>3 · 对齐预览</h2><p id="previewLabel">已有候选</p><canvas id="overlay" tabindex="0" aria-label="对齐叠加预览"></canvas><svg class="markers" id="overlayMarkers"></svg><div class="error"></div><div class="legend"><span class="blue">蓝：固定片段</span> · <span class="orange">橙：移动片段</span></div></section>
+</div>
+</main>
+<script id="alignment-data" type="application/json">__DATA__</script>
+<script>
+if(document.getElementById('alignment-data').textContent.trim()==='__DATA__'){
+ document.getElementById('status').textContent='这是没有模型数据的开发模板。请运行 scripts/start-web-studio.ps1，并打开 http://127.0.0.1:8877；然后选择“对应点配准”。';
+ document.getElementById('modelFiles').textContent='模板未绑定模型。实际模型已收录在 Web 工作台与 reports 目录的已生成页面。';
+}
+</script>
+<script>__MATH__</script>
+<script>__RASTER__</script>
+<script>__APP__</script>
+</html>

@@ -1,0 +1,237 @@
+{
+  "cases": [
+    {
+      "label": "joint-cup",
+      "input_points": 190388,
+      "stages": [
+        {
+          "name": "read_only_mapping_and_streaming_bounds",
+          "seconds": 0.017814099999668542,
+          "rss_after_bytes": 35471360
+        },
+        {
+          "name": "import_open3d",
+          "seconds": 0.7633495000045514,
+          "rss_after_bytes": 88346624
+        },
+        {
+          "name": "open3d_full_cloud_read",
+          "seconds": 0.03692310000042198,
+          "rss_after_bytes": 102293504
+        },
+        {
+          "name": "voxel_down_sample_0_5mm",
+          "seconds": 0.07579899999836925,
+          "rss_after_bytes": 112381952
+        },
+        {
+          "name": "estimate_normals_capped_200k_radius_1_5mm",
+          "seconds": 0.09309080000093672,
+          "rss_after_bytes": 125227008
+        },
+        {
+          "name": "ckdtree_build_full_cloud",
+          "seconds": 0.40411090000270633,
+          "rss_after_bytes": 155254784
+        },
+        {
+          "name": "ckdtree_5000_nearest_queries",
+          "seconds": 0.005059999995864928,
+          "rss_after_bytes": 155467776
+        },
+        {
+          "name": "ckdtree_5mm_radius_query",
+          "seconds": 6.10999995842576e-05,
+          "rss_after_bytes": 155533312
+        },
+        {
+          "name": "mapped_full_scan_5mm_radius_query",
+          "seconds": 0.0098061000026064,
+          "rss_after_bytes": 155561984
+        }
+      ],
+      "memory": {
+        "baseline_rss_bytes": 35127296,
+        "sampled_peak_rss_bytes": 155656192,
+        "process_lifetime_peak_working_set_bytes": 169193472,
+        "rss_at_end_bytes": 155656192,
+        "sampling_interval_seconds": 0.01
+      }
+    },
+    {
+      "label": "fine-figure",
+      "input_points": 793214,
+      "stages": [
+        {
+          "name": "read_only_mapping_and_streaming_bounds",
+          "seconds": 0.08236670000042068,
+          "rss_after_bytes": 35389440
+        },
+        {
+          "name": "import_open3d",
+          "seconds": 0.7769057999976212,
+          "rss_after_bytes": 88948736
+        },
+        {
+          "name": "open3d_full_cloud_read",
+          "seconds": 0.15425909999612486,
+          "rss_after_bytes": 146296832
+        },
+        {
+          "name": "voxel_down_sample_0_5mm",
+          "seconds": 0.2634457000021939,
+          "rss_after_bytes": 173113344
+        },
+        {
+          "name": "estimate_normals_capped_200k_radius_1_5mm",
+          "seconds": 0.14876430000003893,
+          "rss_after_bytes": 192126976
+        },
+        {
+          "name": "ckdtree_build_full_cloud",
+          "seconds": 0.5946078999986639,
+          "rss_after_bytes": 233402368
+        },
+        {
+          "name": "ckdtree_5000_nearest_queries",
+          "seconds": 0.008182800003851298,
+          "rss_after_bytes": 233615360
+        },
+        {
+          "name": "ckdtree_5mm_radius_query",
+          "seconds": 0.0001021999996737577,
+          "rss_after_bytes": 233697280
+        },
+        {
+          "name": "mapped_full_scan_5mm_radius_query",
+          "seconds": 0.03830500000185566,
+          "rss_after_bytes": 234913792
+        }
+      ],
+      "memory": {
+        "baseline_rss_bytes": 35053568,
+        "sampled_peak_rss_bytes": 258572288,
+        "process_lifetime_peak_working_set_bytes": 263053312,
+        "rss_at_end_bytes": 235012096,
+        "sampling_interval_seconds": 0.01
+      }
+    },
+    {
+      "label": "legacy-preview",
+      "input_points": 1519059,
+      "stages": [
+        {
+          "name": "read_only_mapping_and_streaming_bounds",
+          "seconds": 0.1331064999976661,
+          "rss_after_bytes": 35409920
+        },
+        {
+          "name": "import_open3d",
+          "seconds": 0.761879300000146,
+          "rss_after_bytes": 88633344
+        },
+        {
+          "name": "open3d_full_cloud_read",
+          "seconds": 0.2349019000030239,
+          "rss_after_bytes": 161910784
+        },
+        {
+          "name": "voxel_down_sample_0_5mm",
+          "seconds": 0.7485881000029622,
+          "rss_after_bytes": 207482880
+        },
+        {
+          "name": "estimate_normals_capped_200k_radius_1_5mm",
+          "seconds": 0.1574996999988798,
+          "rss_after_bytes": 221880320
+        },
+        {
+          "name": "ckdtree_build_full_cloud",
+          "seconds": 0.8650119999947492,
+          "rss_after_bytes": 277848064
+        },
+        {
+          "name": "ckdtree_5000_nearest_queries",
+          "seconds": 0.009802499997022096,
+          "rss_after_bytes": 278040576
+        },
+        {
+          "name": "ckdtree_5mm_radius_query",
+          "seconds": 0.00017780000052880496,
+          "rss_after_bytes": 278155264
+        },
+        {
+          "name": "mapped_full_scan_5mm_radius_query",
+          "seconds": 0.07096330000058515,
+          "rss_after_bytes": 278192128
+        }
+      ],
+      "memory": {
+        "baseline_rss_bytes": 35053568,
+        "sampled_peak_rss_bytes": 314597376,
+        "process_lifetime_peak_working_set_bytes": 414269440,
+        "rss_at_end_bytes": 278290432,
+        "sampling_interval_seconds": 0.01
+      }
+    },
+    {
+      "label": "synthetic-10m-sequential",
+      "input_points": 10000000,
+      "stages": [
+        {
+          "name": "read_only_mapping_and_streaming_bounds",
+          "seconds": 0.8500587000016822,
+          "rss_after_bytes": 35442688
+        },
+        {
+          "name": "import_open3d",
+          "seconds": 0.7476819999938016,
+          "rss_after_bytes": 88764416
+        },
+        {
+          "name": "open3d_full_cloud_read",
+          "seconds": 1.3739130000030855,
+          "rss_after_bytes": 568999936
+        },
+        {
+          "name": "voxel_down_sample_0_5mm",
+          "seconds": 4.069273599998269,
+          "rss_after_bytes": 789225472
+        },
+        {
+          "name": "estimate_normals_capped_200k_radius_1_5mm",
+          "seconds": 0.14101720000326168,
+          "rss_after_bytes": 808251392
+        },
+        {
+          "name": "ckdtree_build_full_cloud",
+          "seconds": 4.540265399999043,
+          "rss_after_bytes": 1045155840
+        },
+        {
+          "name": "ckdtree_5000_nearest_queries",
+          "seconds": 0.011598900004173629,
+          "rss_after_bytes": 1045372928
+        },
+        {
+          "name": "ckdtree_5mm_radius_query",
+          "seconds": 0.00012170000263722613,
+          "rss_after_bytes": 1045450752
+        },
+        {
+          "name": "mapped_full_scan_5mm_radius_query",
+          "seconds": 0.4363041000033263,
+          "rss_after_bytes": 1047093248
+        }
+      ],
+      "memory": {
+        "baseline_rss_bytes": 35086336,
+        "sampled_peak_rss_bytes": 1200697344,
+        "process_lifetime_peak_working_set_bytes": 1839689728,
+        "rss_at_end_bytes": 1047195648,
+        "sampling_interval_seconds": 0.01
+      }
+    }
+  ],
+  "method": "Independent CPU workers; KD-tree stage includes first SciPy import; 10M input is synthetic."
+}

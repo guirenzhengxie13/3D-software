@@ -1,0 +1,1041 @@
+{
+  "scope": "Source, documentation, example configuration and selected research figures; excludes scans, full reports, environment and vendor software.",
+  "files_exclude_this_manifest": true,
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 229,
+      "sha256": "4667799a2d429b4f91de03e0102e62d8b1b4f75990d7fc47650c8fcf48c791d4"
+    },
+    {
+      "path": "README.md",
+      "bytes": 10106,
+      "sha256": "dba7edb23bc27898764c6054256d4b48cddd296880db9f40ed9cc7d5e067802d"
+    },
+    {
+      "path": "config/range2.example.json",
+      "bytes": 697,
+      "sha256": "3a6a7a5344344109806bc93705f5195a8e4a91c7baf836a61883af1880cd0176"
+    },
+    {
+      "path": "data/README.md",
+      "bytes": 399,
+      "sha256": "833fe050c84c4f122e4044844101e4fdd6295c8423a7ff21a466dc7668a3b97e"
+    },
+    {
+      "path": "docs/backup-and-restore.md",
+      "bytes": 3206,
+      "sha256": "48a0c74b1fd922430078eda985aee994c8d2f7ba15665b0189e780cb4ec2f32f"
+    },
+    {
+      "path": "docs/depth-to-pointcloud-data-structures.md",
+      "bytes": 8746,
+      "sha256": "7b143d2bb4891acbbd9efd85bc0f56175fa69da9ff88c65507b6b2f118dfba81"
+    },
+    {
+      "path": "docs/four-scan-experiment.md",
+      "bytes": 12962,
+      "sha256": "438f33efe956e93e8edfe0d65f98feeb15a0d7c149f75bdeb56ec957c7f806f0"
+    },
+    {
+      "path": "docs/github-projects.md",
+      "bytes": 9215,
+      "sha256": "0b179c9fa7ffd614ee9435ae30d005ef050cdcaa68b2815f55f4544ce2bc45cb"
+    },
+    {
+      "path": "docs/landmark-workbench.md",
+      "bytes": 6751,
+      "sha256": "50c1834df520699919defe429db6de4d00ced5683b573cd21b54abfa47f44e3b"
+    },
+    {
+      "path": "docs/offline-coverage-guidance.md",
+      "bytes": 4924,
+      "sha256": "53b26fa52194dd28c1a58b676f579cdf92516fd5d3b02d452b43933381936640"
+    },
+    {
+      "path": "docs/offline-ingestion-plan.md",
+      "bytes": 8323,
+      "sha256": "d0cb41a84a8be4c95cad5d95feda2e51d508c0ef90a8c6792fed599d3722f96b"
+    },
+    {
+      "path": "docs/offline-reconstruction-pipeline.md",
+      "bytes": 40993,
+      "sha256": "ffa864203d81551b3df5bbeec4639850a722e100cf944cd674413dffaec82730"
+    },
+    {
+      "path": "docs/offline-workflow-runner.md",
+      "bytes": 5592,
+      "sha256": "dc8c1eff86a5b9721be5060c3ad3c22289498e31c889367e9d99af0e35bd78d3"
+    },
+    {
+      "path": "docs/pointcloud-scale-and-local-interaction.md",
+      "bytes": 6930,
+      "sha256": "2fa214f52c49eb2aab39995bd07c60c731045fff6afd9d69310db90a594871e2"
+    },
+    {
+      "path": "docs/pose-recovery.md",
+      "bytes": 5711,
+      "sha256": "ada9003cc40372d9be1447e5c84f19a7aa1fa841f689744754c35a5cd6c5f5d2"
+    },
+    {
+      "path": "docs/progress-archive-20261019.md",
+      "bytes": 7402,
+      "sha256": "161dffcc84b386163b89c087ff1008354c28cb45ffcfd92c9a59c975a0e322c7"
+    },
+    {
+      "path": "docs/progress-archive-20261020-web.md",
+      "bytes": 2637,
+      "sha256": "8b54dcb51e815672b817fdc01186ca3d32e148e315ff46e903a3ff341419fc5f"
+    },
+    {
+      "path": "docs/project-scope.md",
+      "bytes": 6370,
+      "sha256": "18d68139c32a7eb5d2da99cbc0fcfbb6558714b2b939de39e176c4c4448fdc3b"
+    },
+    {
+      "path": "docs/range2-integration.md",
+      "bytes": 6134,
+      "sha256": "a0db222375d08e371edc93fc3711c88a6b4e556316e95def880ba45744d1e68e"
+    },
+    {
+      "path": "docs/range2-study-20261018.md",
+      "bytes": 46395,
+      "sha256": "8f47a0fb9b4e17f7f6c2f016f5b6093e1758e23d55c7e888ff906625166d9133"
+    },
+    {
+      "path": "docs/recovery-integration.md",
+      "bytes": 5703,
+      "sha256": "997a2864caec744e3b6f1ad064d528fa091640d7a959f9163693e45396f7d8e8"
+    },
+    {
+      "path": "docs/revopoint-sdk-research.md",
+      "bytes": 12252,
+      "sha256": "afc066c528fdb9ce0ed65d6fd94b3377743438a47b5a13815b0867186a627b68"
+    },
+    {
+      "path": "docs/sample-request.md",
+      "bytes": 1786,
+      "sha256": "e952bf890eb61ee79da347b502a82225f05d87c09e34314bd49b0c77b18f9411"
+    },
+    {
+      "path": "docs/sdk-request-email.md",
+      "bytes": 8572,
+      "sha256": "a0a453e9edb6deb2c82606b670396ca255e9f6f04d545bc969111caf945e6aa3"
+    },
+    {
+      "path": "docs/unpacking-to-pointcloud-explained.md",
+      "bytes": 7022,
+      "sha256": "22904084b4f5a6b4c18735abbbd67bdb4f8dc97ec826f523a938c8c70b037d2d"
+    },
+    {
+      "path": "docs/web-studio.md",
+      "bytes": 6431,
+      "sha256": "b74b94244dff09b2c2775b21fbb38bfea51acb00a9976d2e6d468c59fbac2d40"
+    },
+    {
+      "path": "docs/workflow-agent-design.md",
+      "bytes": 9218,
+      "sha256": "0b557244bfa02f8527a58a6016c5bef24e7a8e14223de876e696f7431ceb43e6"
+    },
+    {
+      "path": "downloads/README.md",
+      "bytes": 679,
+      "sha256": "cc8e6b41aaded9e94de7a26c1ab867ef3bfa4de0d25970dab6d1bcd133cfbf38"
+    },
+    {
+      "path": "native_probe/.gitignore",
+      "bytes": 8,
+      "sha256": "020c2606e8ed484089c2083e0be438b9d0736bee1558a6b76af0d58bd23f69cf"
+    },
+    {
+      "path": "native_probe/build.cmd",
+      "bytes": 724,
+      "sha256": "9fa889c13c1a98f725b3d0803a8d806825c1131c9da398f73bbd3b69e5c0ce4a"
+    },
+    {
+      "path": "native_probe/main.cpp",
+      "bytes": 5457,
+      "sha256": "fcbfda47968c94c09355dd8a2b274a4d2af1aa24ada4d9db26f222850e75fbb8"
+    },
+    {
+      "path": "native_probe/run.ps1",
+      "bytes": 502,
+      "sha256": "dd8ae9518ec7e8b81a94424f976b16baf78a7e6e87ada59df92f22b44f70827e"
+    },
+    {
+      "path": "pyproject.toml",
+      "bytes": 587,
+      "sha256": "5cf0274f8f6816a7acb481d55a8b6f6aa66337e98ae8641ae23802a55b9e26af"
+    },
+    {
+      "path": "requirements-windows-py312.lock.txt",
+      "bytes": 1156,
+      "sha256": "ffbe9786f774b8e45be4044b3c0da18abb7ec0272cd67bb7f10a2113bbccf9b1"
+    },
+    {
+      "path": "research/snapshots/2026-10-20/README.md",
+      "bytes": 2392,
+      "sha256": "e11966f965a3b7bded8733205376ca6c5c0ea29ab8c07de9bc4577f96aedd902"
+    },
+    {
+      "path": "research/snapshots/2026-10-20/all-main-reconstructions.png",
+      "bytes": 1110763,
+      "sha256": "8e69456cab3eac3eb8aa0410f447d3ed5b770a3b4542ff01f893950f8d48f570"
+    },
+    {
+      "path": "research/snapshots/2026-10-20/cpu-operation-measurements.json",
+      "bytes": 7232,
+      "sha256": "a25a95e877c3a5ba3277c1356b1335c395e318af60ec1bdf4bea26638fe55bf0"
+    },
+    {
+      "path": "research/snapshots/2026-10-20/direct-fragment-fusion.png",
+      "bytes": 286337,
+      "sha256": "16360a6294e6e468ff490b2a9552071eedf06505412d1e5e07b655135859cc1d"
+    },
+    {
+      "path": "research/snapshots/2026-10-20/figure-provenance.json",
+      "bytes": 1821,
+      "sha256": "71b5acff8dc2f834d64b0f22af162b42ab8aa3531568176f9732fb33ab582d8d"
+    },
+    {
+      "path": "research/snapshots/2026-10-20/memory-budget.png",
+      "bytes": 65116,
+      "sha256": "89b6064860d6f5811aeaa67ad88402fd6b9de642a892eecb29bf4849da27d8f6"
+    },
+    {
+      "path": "research/snapshots/2026-10-20/official-and-own-color.png",
+      "bytes": 248218,
+      "sha256": "57ce46c18d9fa939688e0a139daefc4dcc155782ec4a5dc29cd86012130468ba"
+    },
+    {
+      "path": "research/snapshots/2026-10-20/preview-coverage.png",
+      "bytes": 264956,
+      "sha256": "0731457686a0b20fec3699e77b57b0b6ec743e2962ffaab5536c2b0ad302c434"
+    },
+    {
+      "path": "research/snapshots/2026-10-20/research-summary.json",
+      "bytes": 2732,
+      "sha256": "6e270ab94ffad7eb527ed437a787b0abf62803d8bb7f1168737a24d5b74ba0c3"
+    },
+    {
+      "path": "research/snapshots/2026-10-20/two-scan-depth-fusion.png",
+      "bytes": 347436,
+      "sha256": "590f4529a639e43f6b0d886aae85f3504ebc086182df4ae8813d484bbaeef155"
+    },
+    {
+      "path": "research/snapshots/2026-10-20/workbench-cpu-raster.png",
+      "bytes": 132625,
+      "sha256": "6d618a3556d0d8d0872c22258580bc9a3aebb3eedc69484cd738a65885481c67"
+    },
+    {
+      "path": "scripts/analyze_attribute_frame_metadata.py",
+      "bytes": 6771,
+      "sha256": "a9b3ecd1d3b77d0e04a0160a95f7b0816c497888204823206d44760b5416b977"
+    },
+    {
+      "path": "scripts/analyze_attribute_markers.py",
+      "bytes": 6288,
+      "sha256": "8698b9614ab694e21b97a455c5f5b275de17b6e78dc0941fd8022a8208952d98"
+    },
+    {
+      "path": "scripts/analyze_depth_repeatability.py",
+      "bytes": 7342,
+      "sha256": "079f740252f76bf287cd6620e4d301996ef16746c16b1f87bc2255a128a3b221"
+    },
+    {
+      "path": "scripts/analyze_depth_sequence_consistency.py",
+      "bytes": 9168,
+      "sha256": "b9235d0f4986e1d7cd882ddb18e6a2a80a282247255840f5da7e9be8054aa90c"
+    },
+    {
+      "path": "scripts/analyze_marker_opaque_fields.py",
+      "bytes": 2862,
+      "sha256": "a7401618044d660dc05785036643933253cd8aba6eb5c4d1478536c1e0f2dd1e"
+    },
+    {
+      "path": "scripts/analyze_mesh_surface_comparison.py",
+      "bytes": 10538,
+      "sha256": "642e8dbac64638cb784a43c370f9c4abcd2c165c1fd8ae9747f0cef06ff54d46"
+    },
+    {
+      "path": "scripts/analyze_multi_scan_fusion.py",
+      "bytes": 9205,
+      "sha256": "bf8695a269159d940fd38f3fe4df42ffc5f37b0825eaadc246ee578b9b570812"
+    },
+    {
+      "path": "scripts/analyze_multi_scan_local_planes.py",
+      "bytes": 10725,
+      "sha256": "b0eda2b62d6f4dd2267e9da0ada46413e4ba51c717cdabb141cdcf37299e6bf9"
+    },
+    {
+      "path": "scripts/analyze_multi_scan_pixel_sensitivity.py",
+      "bytes": 9796,
+      "sha256": "9873b443cb70d34a2b1559f66503363052036b07c882516f81209c3d6cb1d0de"
+    },
+    {
+      "path": "scripts/analyze_piecewise_holdout.py",
+      "bytes": 14235,
+      "sha256": "3d58aaf97c3ac26205ec4e96f778ea2b38f45ea10c5fa384829b4a21470823ed"
+    },
+    {
+      "path": "scripts/analyze_pointcloud_scale.py",
+      "bytes": 13256,
+      "sha256": "7b24de44a71a857906dda3ce385fce762cf1a4b17bc3c2f3a7e5675ef3674ec7"
+    },
+    {
+      "path": "scripts/analyze_surface_view_coverage.py",
+      "bytes": 11878,
+      "sha256": "217216e805ecf44460df726611aafe4e76137ca8126bb6d17baae7b81783e5f2"
+    },
+    {
+      "path": "scripts/analyze_turntable_poses.py",
+      "bytes": 8048,
+      "sha256": "4d82e941104de967910e94a4f02b6c46b8f8e7c443f1e5bd31802b516201fcc2"
+    },
+    {
+      "path": "scripts/apply_landmark_alignment.py",
+      "bytes": 4965,
+      "sha256": "f86b4bed8cdd01e9e9da74031f274cc6faad38a070fc01e0794f7ad39441d521"
+    },
+    {
+      "path": "scripts/audit_saved_capture_metadata.py",
+      "bytes": 3220,
+      "sha256": "f2777632384983224ef3b3c9af9a0c471dc4ce66e0cf909bbcd0cdd75c97df97"
+    },
+    {
+      "path": "scripts/benchmark_ply_spatial_index.py",
+      "bytes": 4870,
+      "sha256": "3bb5317b872d238b7a010b54812de224deeaa5f07975cc8bb64fd085e46c93b0"
+    },
+    {
+      "path": "scripts/benchmark_pointcloud_operations.py",
+      "bytes": 7362,
+      "sha256": "886a430f30dab9b43c2ee5b0ead42f65f24e011df246a9c2891ba1923e7210cd"
+    },
+    {
+      "path": "scripts/build_attribute_study_report.py",
+      "bytes": 38714,
+      "sha256": "49607e1e1e39fc19f3c4699d3278683b0b0de4e783463ab24e059fd99edd66a8"
+    },
+    {
+      "path": "scripts/build_direct_group_study_report.py",
+      "bytes": 10399,
+      "sha256": "61b584adac4af8610f96c3a4b81524f2c7733c271ff6ce46d42cb79ef20d0cb7"
+    },
+    {
+      "path": "scripts/build_failed_scan_diagnosis_report.py",
+      "bytes": 7283,
+      "sha256": "9b2564716394b3b4f072d224245df261f94560a44c21cf67f74def91cde897de"
+    },
+    {
+      "path": "scripts/build_four_scan_review.ps1",
+      "bytes": 2220,
+      "sha256": "3d310e59a6ba0de056d5a2e617cfc05beecc3465ffd2dd95308d457c9d2aa379"
+    },
+    {
+      "path": "scripts/build_fusion_comparison.py",
+      "bytes": 31635,
+      "sha256": "ee2391d65fe9d20a0baf92a1b31ff73ec3eb6d82ebc743a8af5be68d48950cf6"
+    },
+    {
+      "path": "scripts/build_landmark_workbench.py",
+      "bytes": 8021,
+      "sha256": "f8b6851fc626a6737a013426eb8e2e5e24735279bfe3b171f210d60a22da6f38"
+    },
+    {
+      "path": "scripts/build_multi_scan_fusion_report.py",
+      "bytes": 9559,
+      "sha256": "418676496f0fa5111f084f64b4f4732723f52a54901c904bd77a5ae99bbac2bd"
+    },
+    {
+      "path": "scripts/build_piecewise_crosscheck_report.py",
+      "bytes": 8437,
+      "sha256": "b6243600fbc92f53aa3d8559fd551afad214988cd3c3b4f8aa494f751ec12d34"
+    },
+    {
+      "path": "scripts/build_ply_spatial_index.py",
+      "bytes": 776,
+      "sha256": "959b1bfa16eea9e6b698615eda8b0fd05e51bbf8e0c9d20d0637b915ff4822da"
+    },
+    {
+      "path": "scripts/build_pointcloud_lod.py",
+      "bytes": 6851,
+      "sha256": "56be28489e123d3d02ee0ec15a2028f9c9c9dfbc4ef4bfb4cf65c89e0f007e50"
+    },
+    {
+      "path": "scripts/build_pointcloud_scale_report.py",
+      "bytes": 16515,
+      "sha256": "6b99ced1778ead6a2892ffb3cb774e09d6e6de8c9f3607c6afdc4013b69d2d4e"
+    },
+    {
+      "path": "scripts/build_reconstruction_review.py",
+      "bytes": 21364,
+      "sha256": "21c04c95ef8323ead3f03ced46e01835fd8bd8bfe053366b4da29914ee74230e"
+    },
+    {
+      "path": "scripts/build_segment_alignment_workbenches.py",
+      "bytes": 3487,
+      "sha256": "afa819264e79ae8c48f41768f3fcb5050d6d72b6c031d3c7c374fa7261fd5f78"
+    },
+    {
+      "path": "scripts/build_tensor_study_report.py",
+      "bytes": 6543,
+      "sha256": "54f26313b70c239389a02b231fca94d14af2fabe0fb7274d800e2aed20166a37"
+    },
+    {
+      "path": "scripts/build_web_studio_showcase.py",
+      "bytes": 5990,
+      "sha256": "07657b6fbefb47821321bf5b62ff7fec17eefc9b436ab837800191e22716a80e"
+    },
+    {
+      "path": "scripts/build_workflow_run_report.py",
+      "bytes": 7827,
+      "sha256": "3612b87b826e99c6546d79d0c4354e859d0e0d6c01d8826bec71044f216819a5"
+    },
+    {
+      "path": "scripts/check_cached_landmark_roundtrip.py",
+      "bytes": 3755,
+      "sha256": "358d22d7166cb821f2f0397aeefc5df0f048d4763e1ab360232049c3d33f5eb6"
+    },
+    {
+      "path": "scripts/check_environment.py",
+      "bytes": 4338,
+      "sha256": "a9235e74b1c7ec5aa500f86cc97c4b1755ce2f3ff49f2dab45f6ea38c5fde158"
+    },
+    {
+      "path": "scripts/check_landmark_math.py",
+      "bytes": 1437,
+      "sha256": "084de80475aaa389ac47fb2f9ec72404889d9aae6c98977e53928690aab0e1ed"
+    },
+    {
+      "path": "scripts/check_landmark_session_roundtrip.py",
+      "bytes": 3370,
+      "sha256": "ec3730adff0a8062c2597587177a0ba2ffe9f5211eeff8109917596b40d81b1a"
+    },
+    {
+      "path": "scripts/check_multi_scan_tsdf.py",
+      "bytes": 4049,
+      "sha256": "95fcf3346e7662596395a81c2dcc7dc675167ea1f326af3d0a8f7b5f9af5eee0"
+    },
+    {
+      "path": "scripts/check_standard_identity.py",
+      "bytes": 11286,
+      "sha256": "86a989cf22371a3cb6277994398d76773eefae353f1637ea5ccf4d5edaee485c"
+    },
+    {
+      "path": "scripts/check_web_studio_live.py",
+      "bytes": 5578,
+      "sha256": "e3216c7a24e9c5c2aef3dc696c57f16634ffdde795a540f7ed6f2a8484259928"
+    },
+    {
+      "path": "scripts/check_workbench_compatibility.cjs",
+      "bytes": 3728,
+      "sha256": "22f6652420ad3edd5ae80b76d7eba556b621714e69ca0aa5a7002684ac074a63"
+    },
+    {
+      "path": "scripts/compare_fusion_results.py",
+      "bytes": 18178,
+      "sha256": "b1db53d0e0d7d37359eeb1f4bb5d836060a28d4c31de75c89fe1d9b63bca6b67"
+    },
+    {
+      "path": "scripts/compare_project_previews.py",
+      "bytes": 8657,
+      "sha256": "9d67f892c0445a14cb41a821a8294bcd3b544364f3686c29bf8f7ffcba59dfe0"
+    },
+    {
+      "path": "scripts/correct_attribute_color_caches.py",
+      "bytes": 3540,
+      "sha256": "4a5adff138d0851e3d8c2e21776f8bca42d1f5b2bb81ba2c665f392cf253e7ac"
+    },
+    {
+      "path": "scripts/create_pointcloud_stress_fixture.py",
+      "bytes": 2903,
+      "sha256": "aadac0cdf9242e5ae459ae90d902962780d3038399499fa4b4357428bc13d80b"
+    },
+    {
+      "path": "scripts/create_research_snapshot.py",
+      "bytes": 6492,
+      "sha256": "0d4ece2c55cca3976f0a1fa2ce223c229b24dd67f798b21dd2217269aa0c9b8c"
+    },
+    {
+      "path": "scripts/decode_attribute_projects.py",
+      "bytes": 16051,
+      "sha256": "12c884a86b81ff8977e80c1b13bcb251969cd801c293b03c52400f075cd1bb1b"
+    },
+    {
+      "path": "scripts/decode_scan_projects.py",
+      "bytes": 10070,
+      "sha256": "509370605d02b649ebf6e968535466f1d62856df22bb6ca558ca32af25c57e11"
+    },
+    {
+      "path": "scripts/download-official.ps1",
+      "bytes": 1451,
+      "sha256": "09942396d39ce0060fc062980c7428e5f2f2f11b6dc0e48f46d7ed5bc6be17bd"
+    },
+    {
+      "path": "scripts/download_official.py",
+      "bytes": 2185,
+      "sha256": "27e2ff468ab8d81101dd94fa4c5180f1c0b176cb0d8294b2f5c00e720bf42fc5"
+    },
+    {
+      "path": "scripts/evaluate_direct_group_holdout.py",
+      "bytes": 10295,
+      "sha256": "4af5db947394f5c954f5c4c4b64ed4a8538b273a02745316b114b0f2c48aff6a"
+    },
+    {
+      "path": "scripts/evaluate_segment_edge_holdout.py",
+      "bytes": 10649,
+      "sha256": "eaae512510aa597ab39d17f3e83bee660c6db9531fe59cc1cd1589b24c93c470"
+    },
+    {
+      "path": "scripts/experiment_color_seeded_roi.py",
+      "bytes": 7760,
+      "sha256": "20487ba031b2dfa2fa450842cd332670e9e82371866b00953fc78ca901259c6c"
+    },
+    {
+      "path": "scripts/experiment_cross_scan_visibility.py",
+      "bytes": 6730,
+      "sha256": "426eb01bc8d5b644d7ebdadb8ab3ed437422b6670c5a1d342c21b446b659e58c"
+    },
+    {
+      "path": "scripts/experiment_cup_complementarity.py",
+      "bytes": 4659,
+      "sha256": "e822ed44b05c6cac5effb30c738524495e5963cf1ec213a67a34c108ad7af1f2"
+    },
+    {
+      "path": "scripts/experiment_cup_registration.py",
+      "bytes": 6743,
+      "sha256": "b8808698f77b594516b6cc5c4a255bd77c2ba104cb081cbfdd0cceb778a6be7f"
+    },
+    {
+      "path": "scripts/experiment_first_segment_component.py",
+      "bytes": 6516,
+      "sha256": "26a9c1e648a1ad3a32035a658975549ab3ba88bc34b92f34d76e3e8d4bd5aa5b"
+    },
+    {
+      "path": "scripts/experiment_fixed_axis_prior.py",
+      "bytes": 9066,
+      "sha256": "dbd93f4012d3cba485dc3594adaefbc12b228b1091c017f80bae141e2822ed8b"
+    },
+    {
+      "path": "scripts/experiment_id_group_selection.py",
+      "bytes": 5160,
+      "sha256": "ba174df04623f4e5a65bfeb242b9204899647171dd3eb70538b1ac6223ff7ed1"
+    },
+    {
+      "path": "scripts/experiment_multi_scan_tsdf.py",
+      "bytes": 12989,
+      "sha256": "d4cc57384cf3b9191b2d170e2e6e3474c9b019bf3586fa81d76fce520b9fa1c4"
+    },
+    {
+      "path": "scripts/experiment_piecewise_pose_reconstruction.py",
+      "bytes": 6883,
+      "sha256": "1b55f41f1f44c0d3827e91b84c5cc01af5d78ab3e50c189cc86ba589e0f18814"
+    },
+    {
+      "path": "scripts/experiment_segment_pose_graph.py",
+      "bytes": 12635,
+      "sha256": "2bee57efd0e6475e33fa63db051131c6f729b2572475f747afcf198fd432c3da"
+    },
+    {
+      "path": "scripts/export_pointcloud_region.py",
+      "bytes": 3556,
+      "sha256": "666e220c9adc20205255496b728f4be3e424219c495673cbe403e5850cb6ddda"
+    },
+    {
+      "path": "scripts/fit_direct_group_color.py",
+      "bytes": 6283,
+      "sha256": "762a0212540ded9ff541225db99a6794a7d1d97b4225885b4d770b3a703a99c3"
+    },
+    {
+      "path": "scripts/fit_direct_group_registration.py",
+      "bytes": 5774,
+      "sha256": "1c641af8a2e2c477ce205eded0b76652076a2b5483ffebc2255e0884313a2f17"
+    },
+    {
+      "path": "scripts/fuse_depth_points.py",
+      "bytes": 7488,
+      "sha256": "1018b57635ecbda42ce44f5105796660d2604f618d85e9e7259286c01392e360"
+    },
+    {
+      "path": "scripts/inspect_scan_projects.py",
+      "bytes": 11865,
+      "sha256": "d7a604368dbf7d508e894b5e8ce2258ed4bddb89025f263aeb090b276ce4e981"
+    },
+    {
+      "path": "scripts/investigate_projection.py",
+      "bytes": 7855,
+      "sha256": "2720d25e7049af075677a07822d3175446c896ae0285be78283a833926ba6cb7"
+    },
+    {
+      "path": "scripts/prepare_direct_group_study.py",
+      "bytes": 4617,
+      "sha256": "1d937506dbe1db3adf4ba1d28f6a865d9b201bc1b2ccdbecc3cd3649b1b006f0"
+    },
+    {
+      "path": "scripts/probe_segment_color_edges.py",
+      "bytes": 6474,
+      "sha256": "422fce5a297e8a19f161e9e84e2c1e815d2f571e9cb9ac68ce7daa48e8aa1e4d"
+    },
+    {
+      "path": "scripts/propose_offline_scan_views.py",
+      "bytes": 14204,
+      "sha256": "df10ec1c8bec30108aa9f401d70334d75516b8f060353d36d005e164cd91c4b2"
+    },
+    {
+      "path": "scripts/reconstruct_direct_group_candidates.py",
+      "bytes": 6602,
+      "sha256": "8a8dce5938be11fd97dd2a120dadff29cb2325ebf40393c1fe7a9f5b6f85f865"
+    },
+    {
+      "path": "scripts/reconstruct_fragment_plan.py",
+      "bytes": 5431,
+      "sha256": "efc7b56c692d9d3761a05cca9c4b4191687b38f2510227e95a3b1e1bcce87078"
+    },
+    {
+      "path": "scripts/reconstruct_scans.py",
+      "bytes": 23094,
+      "sha256": "9ff966142ee3acf115c9a3e430aeda6763d30c437e2b434955058e6bd1f9f03a"
+    },
+    {
+      "path": "scripts/recover_frame_poses.py",
+      "bytes": 11468,
+      "sha256": "0e636bc610ac7ac025cf364298197c905bc3404069b676d09ae56659f5afcf21"
+    },
+    {
+      "path": "scripts/refine_failed_scan.py",
+      "bytes": 10719,
+      "sha256": "cdb0080a25858d09351038e1cfaca1a4cb81bcf05164b5c75214eb492e2a4cfb"
+    },
+    {
+      "path": "scripts/refine_missing_optimized_poses.py",
+      "bytes": 8545,
+      "sha256": "26c034e4a7fdb892a67d30110a7368482d0ad0b1a80952343995af90eb26f63c"
+    },
+    {
+      "path": "scripts/refresh_workbench_pages.py",
+      "bytes": 2272,
+      "sha256": "f6f84f78ed355210b36ab8ed2c20637b7d5b6c648efdd3ad54b7a4f0363b3331"
+    },
+    {
+      "path": "scripts/register_scans.py",
+      "bytes": 36334,
+      "sha256": "8748be71247e79c648e70ab5985123a9a623e036f57c10b0cb95dc6d60104311"
+    },
+    {
+      "path": "scripts/render_fusion_comparison.py",
+      "bytes": 5656,
+      "sha256": "f7482bcd1323418dfba48df0954792cb5c18fedff08cfcb876f68a4ff4816667"
+    },
+    {
+      "path": "scripts/render_web_studio_compatibility.py",
+      "bytes": 1381,
+      "sha256": "01a039a55d0b4b8d1140cc617ccb6b6770141b05c8c19af2e2d4d40b1964a67c"
+    },
+    {
+      "path": "scripts/run_reconstruction_batch.py",
+      "bytes": 4821,
+      "sha256": "7de73e7fcb2d51366d33d994d9e77eac229c4dcc2b505188445a96855c0518b5"
+    },
+    {
+      "path": "scripts/run_reconstruction_workflow.py",
+      "bytes": 1861,
+      "sha256": "c2aaa526eb778e02f5e114fc68cd1b75b1222764a15b3d1501ac27659df0b8e6"
+    },
+    {
+      "path": "scripts/serve_web_studio.py",
+      "bytes": 356,
+      "sha256": "664366deebf4fe7a38fd557e253ee1636b9c9ceac5543ea4a77b802c6d0167d0"
+    },
+    {
+      "path": "scripts/setup.ps1",
+      "bytes": 1140,
+      "sha256": "4351cf0f0c34167ae388b7f3e21a0d1355a9ac3bb94d5b0c81b7bd3165690aa1"
+    },
+    {
+      "path": "scripts/start-web-studio.ps1",
+      "bytes": 431,
+      "sha256": "114cbec2f505e4fc031e62b9832fee4c53d038a21f60737b2c57c4146cb6372e"
+    },
+    {
+      "path": "scripts/trace_multi_scan_surface_point.py",
+      "bytes": 10707,
+      "sha256": "386621c9f29117e550a7de82b1b7e326a2787cf43481bb08b994ac79124a2dcc"
+    },
+    {
+      "path": "scripts/trace_surface_point.py",
+      "bytes": 8255,
+      "sha256": "21e2d621eec03b4c53464812fcc9bac4ae9fd472fe9e32b5b99fdb7c1b68eb6a"
+    },
+    {
+      "path": "scripts/verify_attribute_study_artifacts.py",
+      "bytes": 18912,
+      "sha256": "7a064744bdeeabfd5a4fe9dd54602c15b3a27fb8e2047869cd35e917b4dbd0c8"
+    },
+    {
+      "path": "scripts/verify_attribute_study_sources.py",
+      "bytes": 2910,
+      "sha256": "a9a485f54bf6492b7eb1afc210e209e7783d0f3b092976211654ec7f70e50609"
+    },
+    {
+      "path": "scripts/verify_offline_view_proposals.py",
+      "bytes": 4231,
+      "sha256": "2e111e792fc1665129876a699f3721eab99fdc540b796b9ffd8bb3bbe09d3f35"
+    },
+    {
+      "path": "scripts/verify_scan_inputs.py",
+      "bytes": 3562,
+      "sha256": "af864b66d76d754dd1be5929ff15e94e35bb29eb91ff1f651ead2007e7d0d700"
+    },
+    {
+      "path": "src/reconstruction_probe/__init__.py",
+      "bytes": 422,
+      "sha256": "c720710ebc0f0657afafd0cfcf54a890d9ed58b6ed57badbd5657dd3c5fd7346"
+    },
+    {
+      "path": "src/reconstruction_probe/__main__.py",
+      "bytes": 48,
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
+    },
+    {
+      "path": "src/reconstruction_probe/_open3d.py",
+      "bytes": 464,
+      "sha256": "fd4ea1156a61efab7c4363b929cd9f975e52dda54324e3dbb2f593596028a518"
+    },
+    {
+      "path": "src/reconstruction_probe/attribute_frames.py",
+      "bytes": 3808,
+      "sha256": "acd72a7846450a9b41b65848d075d0795740f2d35cee50faef73f6284255f7c8"
+    },
+    {
+      "path": "src/reconstruction_probe/candidate_selection.py",
+      "bytes": 1908,
+      "sha256": "f08a61ce4fa798d3127ae7cf6f53a1e07eec72e3f90dcc54b857b89811ce3f21"
+    },
+    {
+      "path": "src/reconstruction_probe/cli.py",
+      "bytes": 3688,
+      "sha256": "248ba3f496f67e09c824da6d1c1ecaca8b48cba781661e61ba69d5d7392a54a4"
+    },
+    {
+      "path": "src/reconstruction_probe/comparison.py",
+      "bytes": 4077,
+      "sha256": "b5aa7feac52ecda1a4a2df9f40be5a5ef0d958b6968c255e589e8842b2215a63"
+    },
+    {
+      "path": "src/reconstruction_probe/depth_footprint.py",
+      "bytes": 2070,
+      "sha256": "a916edec605f693a530784a0d971a1440879d955a3bc7c8383b690ef98a479c8"
+    },
+    {
+      "path": "src/reconstruction_probe/fragment_plan.py",
+      "bytes": 2570,
+      "sha256": "e1be121c6a46ba792eaa1b7b272c8ccf3dc3b22e4bd27398f3caafadce5a8519"
+    },
+    {
+      "path": "src/reconstruction_probe/frames.py",
+      "bytes": 2794,
+      "sha256": "64f1077ea225411facfc25f103a2489e03bff1f5ae903155943e51b121936a95"
+    },
+    {
+      "path": "src/reconstruction_probe/landmark_sessions.py",
+      "bytes": 4627,
+      "sha256": "81b53a36f8ed978aaae9c3d9f0640f808515e6c37b972d146d418e252cf28dc5"
+    },
+    {
+      "path": "src/reconstruction_probe/local_surface_evidence.py",
+      "bytes": 2810,
+      "sha256": "0a3128a4b82699a28fe8fd3d2bb4f0cff2ac61cb414448a33fa43547bfbe535c"
+    },
+    {
+      "path": "src/reconstruction_probe/lod_cache.py",
+      "bytes": 5081,
+      "sha256": "41770a649f91e7c7df358333de90e1068e958169936e727999107db173406a14"
+    },
+    {
+      "path": "src/reconstruction_probe/marker_refinement.py",
+      "bytes": 2627,
+      "sha256": "f1bde351a193f24dc1d1867a17ffd5465bd3e0f1d6793f5d26ce760636048cbf"
+    },
+    {
+      "path": "src/reconstruction_probe/multi_scan.py",
+      "bytes": 3028,
+      "sha256": "cda3abfe42402e325aa753189d72c9114c5f2645b98b29424d14e4def731c892"
+    },
+    {
+      "path": "src/reconstruction_probe/offline.py",
+      "bytes": 4205,
+      "sha256": "d7386760285cfb132ac46410ad0eff7dc8cfa74de7ec3c0fd73460f476c5c061"
+    },
+    {
+      "path": "src/reconstruction_probe/ply.py",
+      "bytes": 1124,
+      "sha256": "bfead4899d55ba808629fe58d25e466af8dd4986a46d8d58995b2b88871dfea1"
+    },
+    {
+      "path": "src/reconstruction_probe/ply_layout.py",
+      "bytes": 3881,
+      "sha256": "89dd4eca252219a55850796c9b65d07533a802080c3941050ee7d794e90f9202"
+    },
+    {
+      "path": "src/reconstruction_probe/ply_spatial_index.py",
+      "bytes": 8976,
+      "sha256": "f5ee6a818799466ffb8e4500c9dd7ac490e67ddf73e503f29585002be63a2a40"
+    },
+    {
+      "path": "src/reconstruction_probe/poses.py",
+      "bytes": 6532,
+      "sha256": "22f1b1fc18f52f7d8d8a0f7dedadd4c3dbd40ed94f65cf045d35a2b7341c313f"
+    },
+    {
+      "path": "src/reconstruction_probe/sources.py",
+      "bytes": 5937,
+      "sha256": "7aa308ccfd9f6a6ae98f853bf61bef9e95ea1ed4886f721df924e4b3e855a010"
+    },
+    {
+      "path": "src/reconstruction_probe/spatial_lod.py",
+      "bytes": 5314,
+      "sha256": "3fafb51a2da1642ee5a5d9bf566d0c90d5665aa86a6cbb61f63b70b270924c0c"
+    },
+    {
+      "path": "src/reconstruction_probe/tensor_tsdf.py",
+      "bytes": 2810,
+      "sha256": "eaf58442a8fb6f9ef6cef6bbd25f63f2bd6d4c3901f9f409b1a151567c817b24"
+    },
+    {
+      "path": "src/reconstruction_probe/turntable.py",
+      "bytes": 8202,
+      "sha256": "5477f424830b41dfe855d734f6e2686bb27548ad50a285b45cdcfc939bd16334"
+    },
+    {
+      "path": "src/reconstruction_probe/view_coverage.py",
+      "bytes": 2496,
+      "sha256": "71485bfe6329c79d8bc8476c3f8cc2c194affac9a53369e2d8d6ba807b348e9e"
+    },
+    {
+      "path": "src/reconstruction_probe/view_planning.py",
+      "bytes": 2430,
+      "sha256": "4b323532041170bf4d3570f4c98c4812f52b47f392cd1b4ac1f01363f0f6f09e"
+    },
+    {
+      "path": "src/reconstruction_probe/viewer.py",
+      "bytes": 1636,
+      "sha256": "8a18910ed5f6c207fc9b138e49b5bf08842bcd10430a53dc4da1c2b186e0c186"
+    },
+    {
+      "path": "src/reconstruction_probe/visibility.py",
+      "bytes": 2505,
+      "sha256": "57bc25b886eb39ead650e8e47755aca4a301c9345cd608eff750931197be496d"
+    },
+    {
+      "path": "src/reconstruction_probe/web_studio.py",
+      "bytes": 26207,
+      "sha256": "004aba3e3c99d74de4803229d1738d57aa2e55f3050e4fb722151a7ad1cecb5f"
+    },
+    {
+      "path": "src/reconstruction_probe/workflow.py",
+      "bytes": 13745,
+      "sha256": "36c17a59d02a834c93eb40f8f6091f339316ae9372392bf457bae4f2967ba857"
+    },
+    {
+      "path": "tests/check_cached_landmark_export.cjs",
+      "bytes": 3666,
+      "sha256": "79884f6d4b3cff2384f3e78dc14afd86b772a2d46414fe21dbd85c5dbd947c0a"
+    },
+    {
+      "path": "tests/check_landmark_math.cjs",
+      "bytes": 1357,
+      "sha256": "9d90b68981038572b46073c1cab974db1ca79e6d00e58bf1e94e38692fb5e62d"
+    },
+    {
+      "path": "tests/check_landmark_workbench.cjs",
+      "bytes": 6180,
+      "sha256": "90bea967d74c1da399e29a5518418231748e8173e8c4c02b005aed3da896153d"
+    },
+    {
+      "path": "tests/check_point_viewer_cpu.cjs",
+      "bytes": 2427,
+      "sha256": "7b85613f1b12e9bace43e07fa96f5cf06383903122379320cb17247dec12065c"
+    },
+    {
+      "path": "tests/check_web_studio.cjs",
+      "bytes": 4673,
+      "sha256": "d5d9756437bae464a4ccb32a546d9645ebe8637a23103fd40cd017378f5e90b8"
+    },
+    {
+      "path": "tests/test_attribute_frames.py",
+      "bytes": 3367,
+      "sha256": "16547e2556cfbe4794ba13a398cd202f69ba84a9d5688870c818a18e346ba132"
+    },
+    {
+      "path": "tests/test_candidate_selection.py",
+      "bytes": 1531,
+      "sha256": "7d9493d774adbdd201bf577d081b40ed6f0ae3b7b2470a307379d3cab760a781"
+    },
+    {
+      "path": "tests/test_comparison.py",
+      "bytes": 9228,
+      "sha256": "8db0f3aa4a3f1f9ecb8ec8ac5853dcad9a54e388851adffe6a38a97ea1e660f4"
+    },
+    {
+      "path": "tests/test_depth_footprint.py",
+      "bytes": 1879,
+      "sha256": "f79fc430bcd34473dfc01b649c19b518df453a2d8971b16e7edd8c44979f9154"
+    },
+    {
+      "path": "tests/test_fragment_plan.py",
+      "bytes": 2335,
+      "sha256": "565121fd9f9ae85c376f922e2faa7d66cee69b1ec364f793adcaaba8f40548e5"
+    },
+    {
+      "path": "tests/test_landmark_sessions.py",
+      "bytes": 2152,
+      "sha256": "ab5d6aa9691ae0c424b0702daec812863481cb0497a1ad0326a9f381626bbd34"
+    },
+    {
+      "path": "tests/test_local_surface_evidence.py",
+      "bytes": 1929,
+      "sha256": "09a34d1b564017b80df596343968b50887cb531ea77eef628461b8ec89814caa"
+    },
+    {
+      "path": "tests/test_lod_cache.py",
+      "bytes": 3756,
+      "sha256": "330b66ef231116629a051e3afb0bf766dfdee9c0f5b7abc182a2a42f26170373"
+    },
+    {
+      "path": "tests/test_marker_refinement.py",
+      "bytes": 1867,
+      "sha256": "38a143a2c422d7f8e994044acc98fd46f1148e239507fd70beedb48d84453df2"
+    },
+    {
+      "path": "tests/test_multi_scan.py",
+      "bytes": 2002,
+      "sha256": "664dc987557f73220437f5ec9e5f531c8c61b76ca99bfb8fb3130d0cce1d7045"
+    },
+    {
+      "path": "tests/test_offline.py",
+      "bytes": 3646,
+      "sha256": "36d98249194e3594bd606cfb17b5fba7157308a05f8ae30dcbcbfb8156dc6c6c"
+    },
+    {
+      "path": "tests/test_ply_layout.py",
+      "bytes": 2430,
+      "sha256": "56b482dc6d528f233c6bfed23e6fffe3ecdb36399cb58f623697ba5f3da49614"
+    },
+    {
+      "path": "tests/test_ply_spatial_index.py",
+      "bytes": 2339,
+      "sha256": "9d3001ca13e16bbd3599cb2bf849ae60305046ec2e125fd1fa860bafeec86603"
+    },
+    {
+      "path": "tests/test_poses.py",
+      "bytes": 5383,
+      "sha256": "6548e594e3c2dfd0ff29dda590f42293d976b81bc9ca01ace4a5b255d40f76dd"
+    },
+    {
+      "path": "tests/test_probe.py",
+      "bytes": 6451,
+      "sha256": "742cc1dfb5a5b34b7c109f789cb3b1eeedaca420b619b2d5b496fbf9e30d1909"
+    },
+    {
+      "path": "tests/test_reconstruction.py",
+      "bytes": 5386,
+      "sha256": "ee5380ef81d035a37e851fec5bb2f60ea896c0e98720089bef17a2b356ec933b"
+    },
+    {
+      "path": "tests/test_shader_interfaces.py",
+      "bytes": 10234,
+      "sha256": "4f3521faeb55f3d250f0dca28276f8bf78c9a8b2d5d215171461d7a6f3bd4630"
+    },
+    {
+      "path": "tests/test_spatial_lod.py",
+      "bytes": 2314,
+      "sha256": "ff74f8eb1947e367bb55c50d808c7674dab2ecc45fd3fcc58379d9ca71020a53"
+    },
+    {
+      "path": "tests/test_tensor_tsdf.py",
+      "bytes": 1749,
+      "sha256": "c397585ccfee8a8c3c55c6c206a725a209a89a804836be9b2c82dbefe8407ff3"
+    },
+    {
+      "path": "tests/test_turntable.py",
+      "bytes": 2926,
+      "sha256": "6d7e29f15b604e5d9001848380c130c24379c1f3f0666be9587b91d4aaa70420"
+    },
+    {
+      "path": "tests/test_turntable_prediction.py",
+      "bytes": 1131,
+      "sha256": "c4a58359d41079ddd6e11ddf38132edf2517bedb0fa9aa2d97490750281e9917"
+    },
+    {
+      "path": "tests/test_view_coverage.py",
+      "bytes": 2228,
+      "sha256": "3c13b3be1bd92dd4e8939d19ad21abc3fa622414aa157b23c273615b7385834f"
+    },
+    {
+      "path": "tests/test_view_planning.py",
+      "bytes": 1332,
+      "sha256": "5bb13bf0c302d08eb82077094c596dab8e8eecf9dd3006c3314fc5f497640054"
+    },
+    {
+      "path": "tests/test_visibility.py",
+      "bytes": 2948,
+      "sha256": "441e2af123a041c83593334efff04cdd8d1c8ac0a9ce2a03fbe9c9eafbb13c41"
+    },
+    {
+      "path": "tests/test_web_studio.py",
+      "bytes": 6406,
+      "sha256": "a2d4a473b90d1e4dcd29a5fdaa3a27379d31dc7c71c7e440152269722376b6ff"
+    },
+    {
+      "path": "tests/test_workflow.py",
+      "bytes": 7435,
+      "sha256": "a3a67503c3a109b406a4472af30d54a68b458200e8fc1b454ccbb50ce31d9616"
+    },
+    {
+      "path": "web/landmark-workbench/app.js",
+      "bytes": 20170,
+      "sha256": "daa2dc30dab30835c8929231d45013aa3ce9bd629b10ce988cad4b54a526462a"
+    },
+    {
+      "path": "web/landmark-workbench/index.html",
+      "bytes": 7219,
+      "sha256": "2e5b08027d2d044da8e386ab49ad5e155bc001e0620b98a2c30800482e9afcb1"
+    },
+    {
+      "path": "web/landmark-workbench/point_raster.js",
+      "bytes": 1717,
+      "sha256": "d486e0bd8295b49014e4c3353767b46399feaa25ede94085aefb31e2de1104ae"
+    },
+    {
+      "path": "web/landmark-workbench/registration_math.js",
+      "bytes": 5380,
+      "sha256": "3e636033a7d119e867ab967d41b5c63ce201d05261a82292bd850e6baf666828"
+    },
+    {
+      "path": "web/studio/app.js",
+      "bytes": 16366,
+      "sha256": "a7e7b8417277f6553325a27fd2bae5878dcd6e5a17ddcfc808924f946473a09e"
+    },
+    {
+      "path": "web/studio/index.html",
+      "bytes": 8070,
+      "sha256": "e1e0b50b25a7767e30809e3badef78814f9028852ccb2ab04a6b2904ca504977"
+    },
+    {
+      "path": "web/studio/ply_reader.js",
+      "bytes": 3569,
+      "sha256": "43f1146ef727f98d1ea5a8c15116c2bd049815a2ce288706a06ab3334edfd6d1"
+    },
+    {
+      "path": "web/studio/point_viewer.js",
+      "bytes": 8232,
+      "sha256": "e127af570d360976625ca6879b2313f46e81b491c5397c4ab651b74d902a7f4a"
+    },
+    {
+      "path": "web/studio/style.css",
+      "bytes": 9500,
+      "sha256": "6ec14d601c91de09cbabb9e9f760454bc8f0ef390a202043a74925365b6cda6b"
+    }
+  ]
+}

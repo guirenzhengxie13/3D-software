@@ -1,0 +1,16 @@
+{
+  "status": "planning_only_not_consumed_by_probe",
+  "device_model": "RANGE 2",
+  "serial_number": null,
+  "sdk_version": null,
+  "sdk_directory": "vendor/revopoint-sdk",
+  "license_file": null,
+  "transport_preference": "usb",
+  "sdk_transport_support": "to_be_confirmed_for_this_sdk_version",
+  "requested_data": ["per_frame_xyz", "frame_id", "device_timestamp", "host_timestamp", "optional_rgb", "optional_depth", "calibration"],
+  "native_xyz_unit": "unknown_verify_with_sdk",
+  "native_coordinate_axes": "unknown_verify_with_sdk",
+  "project_xyz_unit": "metre",
+  "tracking_pose": "optional_not_assumed_available",
+  "sdk_python_abi": "unknown_use_vendor_supported_version_or_cpp_bridge"
+}
