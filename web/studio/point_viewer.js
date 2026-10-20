@@ -3,12 +3,22 @@
  'use strict';
  const dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>{const n=Math.hypot(...a)||1;return a.map(x=>x/n);};
  function multiply(a,b){const c=new Float32Array(16);for(let j=0;j<4;j++)for(let i=0;i<4;i++)for(let k=0;k<4;k++)c[j*4+i]+=a[k*4+i]*b[j*4+k];return c;}
- function decode(text,type){const bytes=Uint8Array.from(atob(text),x=>x.charCodeAt(0)),v=new DataView(bytes.buffer);if(type==='u8')return bytes;return type==='u32'?Uint32Array.from({length:bytes.length/4},(_,i)=>v.getUint32(4*i,true)):Float32Array.from({length:bytes.length/4},(_,i)=>v.getFloat32(4*i,true));}
+ function decode(text,type){if(typeof text!=='string')throw Error('缺少点云编码数据');const bytes=Uint8Array.from(atob(text),x=>x.charCodeAt(0)),v=new DataView(bytes.buffer);if(type==='u8')return bytes;if(bytes.length%4)throw Error('点云编码长度不是4字节的整数倍');return type==='u32'?Uint32Array.from({length:bytes.length/4},(_,i)=>v.getUint32(4*i,true)):Float32Array.from({length:bytes.length/4},(_,i)=>v.getFloat32(4*i,true));}
+ const vector=value=>Array.isArray(value)||(ArrayBuffer.isView(value)&&typeof value.length==='number');
+ function decodePayload(row){
+  // A scalar catalog count must never shadow base64 coordinate arrays.
+  const points=vector(row.points)?Float32Array.from(row.points):decode(row.xyz,'f32');
+  const colors=vector(row.colors)?Uint8Array.from(row.colors):decode(row.rgb,'u8');
+  const originalIds=vector(row.originalIds)?Uint32Array.from(row.originalIds):decode(row.ids,'u32');
+  if(points.length%3||points.length!==colors.length||points.length/3!==originalIds.length||!points.every(Number.isFinite))throw Error('点云坐标、颜色或原编号不完整');
+  if(row.displayPoints!==undefined&&row.displayPoints!==originalIds.length)throw Error('显示点数与实际数组不一致');
+  return {...row,points,colors,originalIds};
+ }
  class PointViewer{
   constructor(canvas,badge,onPick){this.canvas=canvas;this.badge=badge;this.onPick=onPick;this.clouds=[];this.sourceRows=[];this.gain=1.8;this.size=2.5;this.camera={target:[0,0,0],radius:100,distance:350,yaw:1.2,pitch:.15};this.dirty=true;
    try{this.initGL();this.badge.textContent='WebGL';}catch(error){this.enableSoftware();this.badge.textContent='Canvas 兼容绘制';}
    this.events();this.resizeObserver=typeof ResizeObserver!=='undefined'?new ResizeObserver(()=>{this.dirty=true;}):null;this.resizeObserver?.observe(canvas.parentElement);
-   const loop=()=>{requestAnimationFrame(loop);if(this.dirty){this.dirty=false;this.draw();}};requestAnimationFrame(loop);
+   const loop=()=>{requestAnimationFrame(loop);if(this.dirty){this.dirty=false;try{this.draw();}catch(error){if(!this.software){try{this.enableSoftware();return;}catch(fallbackError){error=fallbackError;}}this.badge.textContent='绘制失败：'+error.message;this.lastError=error.message;}}};requestAnimationFrame(loop);
   }
   initGL(){const gl=this.canvas.getContext('webgl',{antialias:true});if(!gl)throw Error('WebGL unavailable');this.gl=gl;
    const compile=(type,src)=>{const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s;};
@@ -19,8 +29,7 @@
   enableSoftware(){if(this.ctx)return;const c=document.createElement('canvas');c.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none';this.canvas.parentElement.insertBefore(c,this.canvas);this.canvas.style.opacity='0';this.canvas.style.position='relative';this.canvas.style.zIndex='1';this.fallback=c;this.ctx=c.getContext('2d');this.software=true;this.badge.textContent='Canvas 兼容绘制';this.dirty=true;}
   setGain(value){this.gain=Math.max(1,Math.min(4,value));this.setClouds(this.sourceRows,false);}
   setClouds(rows,fit=true){this.sourceRows=rows;if(this.gl)for(const old of this.clouds){if(old.gpu){this.gl.deleteBuffer(old.gpu[0]);this.gl.deleteBuffer(old.gpu[1]);}}
-   this.clouds=rows.map((row,i)=>{const c={...row,points:row.points||decode(row.xyz,'f32'),colors:row.colors||decode(row.rgb,'u8'),originalIds:row.originalIds||decode(row.ids,'u32')};
-    if(c.points.length!==c.colors.length||c.points.length/3!==c.originalIds.length||!c.points.every(Number.isFinite))throw Error('点云数组格式不完整');
+   this.clouds=rows.map((row,i)=>{const c=decodePayload(row);
     if(rows.length>1){const tint=i===0?[92,190,255]:[255,178,93];c.colors=new Uint8Array(c.colors.length);for(let j=0;j<c.colors.length;j+=3)c.colors.set(tint,j);}else c.colors=Uint8Array.from(c.colors,value=>Math.min(255,Math.round(value*this.gain)));
     if(this.gl&&!this.software){const gl=this.gl;c.gpu=[c.points,c.colors].map(a=>{const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,a,gl.STATIC_DRAW);return b;});}return c;});if(fit)this.fit();this.dirty=true;
   }
@@ -36,6 +45,7 @@
    if(this.software){this.fallback.width=w;this.fallback.height=h;const data=this.ctx.createImageData(w,h);data.data.set(PointRaster.rasterize(this.clouds,this.mvp,w,h,this.size));this.ctx.putImageData(data,0,0);return;}
    const gl=this.gl,l=this.locations;gl.viewport(0,0,w,h);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.uniformMatrix4fv(l.matrix,false,this.mvp);gl.uniform1f(l.size,this.size*ratio);
    for(const cloud of this.clouds){gl.bindBuffer(gl.ARRAY_BUFFER,cloud.gpu[0]);gl.enableVertexAttribArray(l.position);gl.vertexAttribPointer(l.position,3,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ARRAY_BUFFER,cloud.gpu[1]);gl.enableVertexAttribArray(l.color);gl.vertexAttribPointer(l.color,3,gl.UNSIGNED_BYTE,true,0,0);gl.drawArrays(gl.POINTS,0,cloud.points.length/3);}
+   const error=gl.getError();if(error!==gl.NO_ERROR)throw Error('WebGL绘制错误 0x'+error.toString(16));
   }
   events(){let drag=null;const c=this.canvas;c.addEventListener('pointerdown',e=>{drag={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,pan:e.shiftKey};c.setPointerCapture(e.pointerId);});
    c.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;const a=this.camera;if(drag.pan||e.shiftKey){const z=this.direction(),x=norm(cross([-1,0,0],z)),y=cross(z,x),s=a.distance*.85/Math.max(c.clientHeight,1);a.target=a.target.map((v,i)=>v-x[i]*dx*s+y[i]*dy*s);}else{a.yaw-=dx*.008;a.pitch=Math.max(-1.56,Math.min(1.56,a.pitch+dy*.008));}this.dirty=true;});
@@ -44,5 +54,5 @@
    c.addEventListener('webglcontextlost',e=>{e.preventDefault();this.enableSoftware();});root.addEventListener?.('resize',()=>{this.dirty=true;});
   }
  }
- root.PointViewer=PointViewer;root.decodeCloudArray=decode;
+ root.PointViewer=PointViewer;root.decodeCloudArray=decode;root.decodeCloudPayload=decodePayload;
 })(typeof window!=='undefined'?window:globalThis);

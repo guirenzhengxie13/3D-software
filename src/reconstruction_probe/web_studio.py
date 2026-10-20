@@ -147,9 +147,11 @@ class Studio:
                 image=self.url(images[0]) if images else None,
                 record=self.url(folder/'README.md') if (folder/'README.md').is_file() else None,
                 status=EXPERIMENT_STATUS.get(folder.name,'研究候选 / 对照，需结合证据审阅')))
+            preferred=folder/'full-reconstruction/review.html' if folder.name=='cup-direct-split' else folder/'comparison.html' if folder.name in ['official-fusion-comparison','tensor-tsdf'] else folder/'review.html'
+            if preferred.is_file():experiments[-1]['primary_url']=self.url(preferred)
         priority=['official-fusion-comparison','cup-direct-split','cup-multi-scan-tsdf','cup-roi','tensor-tsdf','cup-first-segment-component']
         experiments.sort(key=lambda row:(priority.index(row['id']) if row['id'] in priority else len(priority),row['id']))
-        for base in [self.study,self.root/'reports/pointcloud-scale-20261019']:
+        for base in [self.study,self.root/'reports/pointcloud-scale-20261019',self.output]:
             for p in sorted(base.rglob('*.html')):
                 if 'workbench' not in p.name:continue
                 text=p.read_text(encoding='utf-8'); match=re.search(r'<script id="alignment-data" type="application/json">(.*?)</script>',text,re.S)
@@ -159,6 +161,12 @@ class Studio:
                     url=self.url(p),models=[dict(path=c['path'],points=c['originalPoints']) for c in data['clouds']])
                 workbenches.append(item);page_registry[identifier]=dict(path=p,data=data)
                 for c in data['clouds']:model(Path(c['path']),label='对应点片段 · '+c['label'])
+                item['scan_ids']=sorted({m['scan_id'] for m in models.values() if m['scan_id'] is not None and m['path'] in {str(Path(c['path']).resolve()) for c in data['clouds']}})
+                if base==self.output:item['label']='自选模型对应点 · '+p.parent.parent.name[:8]
+                elif re.fullmatch(r'segment-\d+-to-\d+',item['label']):
+                    numbers=re.findall(r'\d+',item['label']);item['label']=f'失败杯子 · 片段 {numbers[0]} → {numbers[1]}'
+                elif item['label']=='cached-workbench':item['label']='彩色人偶 · 官方与精细自研'
+                elif item['label']=='landmark-workbench':item['label']='杯子 · 两个主要片段'
         catalog=dict(projects=projects,models=list(models.values()),experiments=experiments,workbenches=workbenches,
             reports=[dict(label='点云数量、内存与局部交互',url='/reports/pointcloud-scale-20261019/index.html'),
                      dict(label='当前成果与成功候选展示',url='/reports/web-studio/index.html'),
@@ -189,7 +197,7 @@ class Studio:
                 records,_=map_ply_vertices(source);preview=budgeted_spatial_preview(records,budget);ids=preview['ids']
                 xyz=np.column_stack([records[n][ids] for n in ['x','y','z']]).astype('<f4');rgb=record_rgb(records,ids);del records
                 selection='体素代表点 · 原编号保留'
-            result=dict(**pack(xyz,rgb,ids),**meta,sourceSha256=file_sha256(source),selection=selection,
+            result=dict(**pack(xyz,rgb,ids),**{k:v for k,v in meta.items() if k!='points'},sourceSha256=file_sha256(source),selection=selection,
                         originalPoints=meta['points'],bounds=[xyz.min(0).tolist(),xyz.max(0).tolist()])
         with self.lock:
             self.cache[key]=result
@@ -230,7 +238,7 @@ class Studio:
             ids=region['original_vertex_ids']
             if len(ids)>60000:raise ValueError('局部完整点超过60000显示预算，请缩小半径')
             xyz=region['xyz_mm'];rgb=record_rgb(index.records,ids)
-        return dict(**pack(xyz,rgb,ids),**meta,originalPoints=meta['points'],sourceSha256=digest,
+        return dict(**pack(xyz,rgb,ids),**{k:v for k,v in meta.items() if k!='points'},originalPoints=meta['points'],sourceSha256=digest,
                     selection=f'局部完整原顶点 · 原点 #{vertex} 周围 {radius_mm:g} mm',exact_region=True,center_mm=center.tolist())
 
     def depth_image(self, scan_id, ordinal):
@@ -254,6 +262,13 @@ class Studio:
                 dict(id='index',tool='cloud.index',parameters=dict(source=model['path'],unit='mm',tile_mm=5.))])
             folder.mkdir(parents=True);(folder/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2),encoding='utf-8')
             command=[sys.executable,str(self.root/'scripts/run_reconstruction_workflow.py'),'--plan',str(folder/'plan.json'),'--out',str(folder/'result'),'--cancel-file',str(folder/'cancel')]
+        elif kind=='workbench':
+            source=self.models.get(request.get('source_id'));target=self.models.get(request.get('target_id'))
+            if source is None or target is None or source['id']==target['id']:raise ValueError('需要两份不同的目录模型')
+            folder.mkdir(parents=True)
+            command=[sys.executable,str(self.root/'scripts/build_landmark_workbench.py'),'--source-cloud',source['path'],'--target-cloud',target['path'],'--unit','mm','--out',str(folder/'result/workbench.html'),
+                     '--notes','来自Web工程工作区的自选模型。原始点和模型不覆盖；同一物理位置需人工判断。']
+            (folder/'selection.json').write_text(json.dumps(dict(source=source,target=target),ensure_ascii=False,indent=2),encoding='utf-8')
         elif kind=='alignment':
             session=request.get('session')
             if not isinstance(session,dict):raise ValueError('需要对应点会话 JSON')
@@ -280,6 +295,7 @@ class Studio:
                     status='completed' if result.returncode==0 else 'failed';job['exit_code']=result.returncode
                     if (folder/'result/state.json').is_file():status=read(folder/'result/state.json')['status']
                     if kind=='spatial' and (folder/'result/index.html').is_file():job['report']=self.url(folder/'result/index.html')
+                    if kind=='workbench' and (folder/'result/workbench.html').is_file():job['report']=self.url(folder/'result/workbench.html')
                     self.refresh()
                     job['status']=status
                 except Exception as error:job['status']='failed';job['error']=str(error)

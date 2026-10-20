@@ -35,6 +35,7 @@ class WebStudioTests(unittest.TestCase):
     def test_catalog_preview_and_stored_pose_reprojection_preserve_identity(self):
         self.assertEqual(self.studio.catalog['summary']['observations'],3);meta=next(iter(self.studio.models.values()));cloud=self.studio.cloud(meta['id'],100)
         self.assertEqual(cloud['originalPoints'],4);self.assertEqual(cloud['displayPoints'],4)
+        self.assertNotIn('points',cloud,'scalar catalog counts must not shadow viewer coordinate arrays')
         np.testing.assert_array_equal(np.frombuffer(base64.b64decode(cloud['ids']),'<u4'),[0,1,2,3])
         f=self.studio.frame('scan_test',0);self.assertTrue(f['pose_available'])
         np.testing.assert_array_equal(np.frombuffer(base64.b64decode(f['xyz']),'<f4').reshape(-1,3),[[12,0,100],[12,100,100],[112,100,100]])
@@ -56,6 +57,9 @@ class WebStudioTests(unittest.TestCase):
 
     def test_unknown_model_job_and_foreign_session_cannot_create_outputs(self):
         with self.assertRaises(ValueError):self.studio.start_job(dict(kind='spatial',model_id='missing'))
+        with self.assertRaises(ValueError):self.studio.start_job(dict(kind='workbench',source_id='missing',target_id='missing'))
+        key=next(iter(self.studio.models))
+        with self.assertRaises(ValueError):self.studio.start_job(dict(kind='workbench',source_id=key,target_id=key))
         with self.assertRaises(ValueError):self.studio.start_job(dict(kind='alignment',session=dict(source=dict(path=str(self.root/'secret.txt')),target=dict(path=str(self.model)))))
         self.assertFalse(self.studio.output.exists())
 

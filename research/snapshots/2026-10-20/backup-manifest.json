@@ -1037,5 +1037,6 @@
       "bytes": 9500,
       "sha256": "6ec14d601c91de09cbabb9e9f760454bc8f0ef390a202043a74925365b6cda6b"
     }
-  ]
+  ],
+  "baseline_git_commit": "045405236c7fcf1ba12a2d71dd2fca8b2406495f"
 }

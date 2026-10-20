@@ -5,6 +5,7 @@ const fs=require('fs'),path=require('path'),assert=require('assert/strict'),vm=r
 const root=path.resolve(__dirname,'..'),out=path.join(root,'reports/web-studio/compatibility');fs.mkdirSync(out,{recursive:true});
 const pages=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())walk(p);else if(e.name.endsWith('.html')&&e.name.includes('workbench'))pages.push(p);}}
 walk(path.join(root,'reports/range2-study-20261018'));walk(path.join(root,'reports/pointcloud-scale-20261019'));
+if(fs.existsSync(path.join(root,'reports/web-studio/runs')))walk(path.join(root,'reports/web-studio/runs'));
 const results=[];
 for(const page of pages){
  const html=fs.readFileSync(page,'utf8'),match=html.match(/<script id="alignment-data" type="application\/json">([\s\S]*?)<\/script>/);if(!match)continue;
