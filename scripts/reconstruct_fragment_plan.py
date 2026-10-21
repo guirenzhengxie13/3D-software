@@ -12,9 +12,10 @@ import numpy as np
 
 from experiment_color_seeded_roi import optical_points
 from reconstruct_scans import optical_to_pose_axes, reconstruct, write_json
-from reconstruction_probe.fragment_plan import compile_fragment_plan
+from reconstruction_probe.fragment_plan import compile_fragment_plan, load_fragment_inputs
 from reconstruction_probe.multi_scan import FrameKey, rigid
 from reconstruction_probe.offline import file_sha256
+from reconstruction_probe.path_mapping import PathMapper
 
 
 def read(path):
@@ -25,16 +26,13 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--decoded',type=Path,required=True)
     parser.add_argument('--plan',type=Path,required=True);parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--saved-control',action='store_true',help='Same selected frames and original ROI, with every correction set to identity')
-    args=parser.parse_args();decoded=args.decoded.resolve();plan_path=args.plan.resolve();out=args.out.resolve()
+    args=parser.parse_args();mapper=PathMapper(Path(__file__).resolve().parents[1])
+    decoded=mapper.resolve(args.decoded);plan_path=mapper.resolve(args.plan);out=mapper.resolve_output(args.out)
     if out.exists() and any(out.iterdir()):parser.error('Use a new/empty output directory')
-    plan=read(plan_path);index_path=decoded/'index.json';index=read(index_path);compiled=compile_fragment_plan(plan,index['scan_id'],file_sha256(index_path),[f['id'] for f in index['frames']])
+    index_path=decoded/'index.json';plan,index,input_digests=load_fragment_inputs(plan_path,index_path,mapper)
+    compiled=compile_fragment_plan(plan,index['scan_id'],input_digests[str(index_path)],[f['id'] for f in index['frames']])
     if sum(row.get('parent_fragment_id') is None for row in plan['fragments'])!=1:
         parser.error('One rooted fragment component per fusion is required; keep unresolved components separate')
-    inputs=[plan_path,index_path]
-    for name,digest in plan.get('input_sha256',{}).items():
-        path=Path(name)
-        if not path.is_file() or file_sha256(path)!=digest:raise ValueError('Fragment-plan reference changed: '+name)
-        inputs.append(path)
     original={rid:rigid(np.load(decoded/f'frame_{rid:010d}'/'pose_optimized.npy',allow_pickle=False)) for rid in compiled['selected_frame_ids']}
     corrections={fragment:(np.eye(4) if args.saved_control else matrix) for fragment,matrix in compiled['corrections'].items()}
     overrides={rid:corrections[compiled['ownership'][FrameKey(index['scan_id'],rid)]]@matrix for rid,matrix in original.items()}
@@ -55,13 +53,17 @@ def main():
         coordinate_frame='explicit_fragment_component_'+index['scan_id'],
         reconstruction_note='Explicit fragment plan: '+plan['decision']+('; saved-pose control' if args.saved_control else '; hierarchical corrections applied')+'. All selected depths now integrated, including earlier reserved records; this output is a demonstration, not heldout evaluation.')
     if selected_count!=len(original) or result['integrated_frames']!=len(original):raise ValueError('Selected fragment frames were not integrated exactly once')
+    integrated_ids=[row['id'] for row in result['frames'] if row['status']=='integrated']
+    if sorted(integrated_ids)!=compiled['selected_frame_ids']:raise ValueError('Integrated original frame IDs differ from the explicit plan')
+    for name,expected in input_digests.items():
+        if file_sha256(Path(name))!=expected:raise ValueError('Pinned fusion input changed during integration: '+name)
     np.savez_compressed(out/'applied-poses.npz',**{f'pose_{rid}':matrix for rid,matrix in overrides.items()})
     summary=dict(status='explicit_fragment_component_candidate_not_promoted',scan_id=index['scan_id'],saved_control=args.saved_control,
         decision=plan['decision'],selected_frames=len(original),selected_frame_ids=compiled['selected_frame_ids'],
         selected_depth_with_frame_ids_sha256=digest.hexdigest(),quality=result['quality'],
         corrections_by_fragment={str(key):value.tolist() for key,value in corrections.items()},
         frame_fragment_ids={str(key.frame_id):fragment for key,fragment in compiled['ownership'].items()},
-        path=str(out/index['scan_id']/'tsdf_pointcloud_mm.ply'),input_sha256={str(path):file_sha256(path) for path in inputs},
+        path=str(out/index['scan_id']/'tsdf_pointcloud_mm.ply'),input_sha256=input_digests,
         limitations=['This manifest selects one explicit connected component; omitted source frames remain available and are not labeled invalid.',
           'All selected frames, including prior reserved frames, now enter this demonstration surface.',
           'Transform provenance and an explicit selection decision are recorded, but do not prove physical correctness.',

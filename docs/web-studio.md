@@ -69,10 +69,32 @@
 & '.\.venv\Scripts\python.exe' scripts\check_web_studio_live.py --port 8877
 ```
 
-记录见 [HTTP集成检查](../reports/web-studio/http-integration-check.json)、[兼容绘制检查](../reports/web-studio/compatibility/summary.json)和[实际CPU绘制图](../reports/web-studio/compatibility/workbench-canvas.png)。旧工作台更新保留了内嵌数据和备份，见 [更新记录](../reports/web-studio/workbench-upgrade.json)。[阶段成果展示页](../reports/web-studio/index.html)可单独查看，目前123项Python测试通过。
+记录见 [HTTP集成检查](../reports/web-studio/http-integration-check.json)、[兼容绘制检查](../reports/web-studio/compatibility/summary.json)和[实际CPU绘制图](../reports/web-studio/compatibility/workbench-canvas.png)。旧工作台更新保留了内嵌数据和备份，见 [更新记录](../reports/web-studio/workbench-upgrade.json)。[阶段成果展示页](../reports/web-studio/index.html)可单独查看，该早期检查为123项；最新回归状态以根目录HANDOFF为准。
 
 ## 当前边界
 
-任意片段的对应点变换已经能核对和另存表面；接回原深度重融合还需明确每帧的片段归属，不能把任意通用PLY直接当原帧工程。当前原两组片段的重融合已有演示，通用片段桥接、统一工程撤销历史、异常帧交互选择和Agent工具调度是下一阶段。
+任意片段的对应点变换已经能核对和另存表面；接回原深度重融合还需明确每帧的片段归属，不能把任意通用PLY直接当原帧工程。当前原两组片段的重融合已有演示，同工程片段桥接已于2026-10-21接通CLI与固定工作流，见下文；网页帧归属编辑、统一工程撤销历史、异常帧交互选择和Agent工具调度仍是下一阶段。
 
 局部取点是完整已生成表面的一部分，不能恢复扫描时没保存的深度或完全未观察到的形状。补扫方向仍是离线建议，不是设备实时引导。SDK方向保持后置。
+
+
+## 2026-10-21 跨电脑路径与重融合桥接
+
+已接收另一台电脑的显示控制与路径适配修改。迁移机器默认读取项目内 `data/revo-scan-projects`；原采集机器可读取其原AppData扫描根。若原件另行移到数据盘，在忽略入库的 `config/path-mapping.local.json` 中显式配置只读映射，例如：
+
+```json
+{"read_mappings":[{"source":"C:\\Users\\5gvs4\\AppData\\Roaming\\Revopoint\\RevoScan6\\Projects","target":"G:\\revo data"}]}
+```
+
+`mappings` 的目标仍限定为项目内相对路径；`read_mappings` 必须指向明确存在的数据目录。任务输出始终留在项目内，不会写入这个外部扫描目录。不要批量修改历史索引、JSON或HTML的原字节来修路径。
+
+新增真实研究“对应点结果到原帧重融合”：核验表面对应点结果、显式绑定原帧并生成片段计划，再以同一组ROI像素运行控制组和校正组。查看实验页的双栏结果和任务记录；当前还没有网页帧归属编辑器。[完整处理逻辑和CLI用法](fragment-fusion-bridge.md)。
+
+
+本机原件已从AppData移到 `G:\revo data`，现通过上述只读配置接回。29工程快照要求的388份原文件、3,031,514,347字节已全部逐份重算SHA并匹配原解包记录。可复查命令：
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_source_relocation.py --out reports/new-source-relocation-check.json
+```
+
+目录中没有生成过的可选 `fuse.ply` / `raw_preview.ply` 不再被误报成复制失败；真正缺失的保存帧与损坏模型仍会显示。以上SHA检查只覆盖快照列出的文件，不等于已经重新解析全部保存帧。

@@ -30,7 +30,7 @@ py -3.12 -m venv .venv
 - **对应点**：选择固定/移动模型，预览刚体变换，后端核对原文件和原坐标，再另存结果。
 - **实验与任务**：保留融合候选、失败尝试、来源证据、处理参数、日志与状态。
 
-当前没有连接语言模型Agent服务。通用片段到原始帧重融合、工程撤销历史仍在开发。
+当前没有连接语言模型Agent服务。同一工程的显式帧归属、对应点核验与原深度重融合已接通CLI和固定工作流；网页帧归属编辑、跨工程通用绑定、工程撤销历史仍在开发。
 
 ## 数据与验证边界
 
@@ -57,6 +57,7 @@ HANDOFF.md                 当前进度、问题、验收与续接入口
 - [当前交接文档](HANDOFF.md)
 - [Web工作台使用说明](docs/web-studio.md)
 - [解包到融合的处理链路](docs/offline-reconstruction-pipeline.md)
+- [对应点结果到原帧重融合](docs/fragment-fusion-bridge.md)
 - [备份范围与恢复方法](docs/backup-and-restore.md)
 - [仓库内的研究快照](research/snapshots/2026-10-20/README.md)
 

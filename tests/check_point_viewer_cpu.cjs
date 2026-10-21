@@ -44,7 +44,7 @@ for(const mode of modes){viewer.setColorMode(mode);glViewer.setColorMode(mode);v
 viewer.setColorMode('original');viewer.setGain(1);viewer.setView('perspective');
 let network=null;
 if(process.argv[2]){
- const payload=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));viewer.setGain(1.8);viewer.setClouds([payload]);viewer.draw();const pixels=canvas.parentElement.fallback.pixels;let visible=0;
+ const payload=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));viewer.setGain(process.argv[4]?1:1.8);viewer.setClouds([payload]);if(process.argv[4])viewer.setColorMode(process.argv[4]);viewer.draw();const pixels=canvas.parentElement.fallback.pixels;let visible=0;
  for(let i=0;i<pixels.length;i+=4)if(pixels[i]!==12||pixels[i+1]!==20||pixels[i+2]!==32)visible++;
  assert.ok(visible>200,'actual HTTP payload produces nonempty point pixels');assert.equal(viewer.clouds[0].originalIds.length,payload.displayPoints);assert.equal(viewer.clouds[0].points.length,payload.displayPoints*3);
  if(process.argv[3])fs.writeFileSync(process.argv[3],pixels);

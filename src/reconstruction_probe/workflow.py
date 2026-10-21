@@ -19,6 +19,12 @@ from .offline import file_sha256
 
 
 TOOLS = {
+    'fragments.plan': ('build_fragment_plan_from_alignment.py', {
+        'decoded': ('--decoded', 'directory', True), 'alignment': ('--alignment', 'directory', True),
+        'binding': ('--binding', 'file', True), 'candidate': ('--candidate', 'candidate_label', True)}),
+    'fragments.fuse': ('reconstruct_fragment_plan.py', {
+        'decoded': ('--decoded', 'directory', True), 'plan': ('--plan', 'file', True),
+        'saved_control': ('--saved-control', 'boolean', False)}),
     'multi_scan.fuse': ('experiment_multi_scan_tsdf.py', {
         'study': ('--study', 'directory', True), 'registration': ('--registration', 'file', True),
         'source_id': ('--source-id', 'token', False)}),
@@ -124,6 +130,9 @@ def validate_plan(plan, workspace):
             elif kind == 'token':
                 if not isinstance(value, str) or not re.fullmatch('[A-Za-z0-9_]{1,100}', value):
                     raise ValueError('Invalid source identifier')
+            elif kind=='candidate_label':
+                if not isinstance(value,str) or not re.fullmatch('[A-Za-z0-9_-]{1,100}',value):
+                    raise ValueError('Invalid candidate label')
             elif kind=='mm_unit':
                 if value!='mm':raise ValueError('Current cloud tools require explicitly established unit mm')
             elif kind=='positive_mm':

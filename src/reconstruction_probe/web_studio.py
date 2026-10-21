@@ -42,6 +42,7 @@ def pack(xyz, rgb, ids):
 
 
 LABELS = {
+    'fragment-bridge-20261021':'对应点结果到原帧重融合 · 完整链路复现',
     'tensor-tsdf':'精细稀疏融合', 'tensor-weight3':'稀疏融合 · 权重门槛',
     'cup-roi':'杯子选区后重新融合', 'cup-direct-split':'直接对齐两片段',
     'cup-first-segment-component':'失败扫描 · 首个片段组件',
@@ -56,6 +57,7 @@ LABELS = {
     'official-fusion-comparison':'官方融合与自研结果', 'comparison':'原扫描预览与自研结果',
 }
 EXPERIMENT_STATUS={
+    'fragment-bridge-20261021':'114帧真实闭环复现；非新增精度提升，网页帧绑定编辑器仍待实现',
     'official-fusion-comparison':'已完成同源表面对比；官方输出也不等于物理真值',
     'cup-direct-split':'358帧融合演示减少重复杯柄；孔洞和碎片仍保留',
     'cup-multi-scan-tsdf':'463帧真实联合融合；已回查互补区域和重复冲突',
@@ -130,10 +132,12 @@ class Studio:
                     poses=status.get('optimized_poses_parsed',status.get('poses_parsed',0)),
                     cohort='Range 2 新批次' if decoded.parent==self.study else '早期四份工程'))
                 if len(present)<len(frames):unavailable('frames',p.parent,f'{len(frames)-len(present)}份保存帧文件尚不可用')
-        def model(path, scan_id=None, label=None, role='candidate'):
+        def model(path, scan_id=None, label=None, role='candidate', optional=False):
             try:
                 path=self.paths.resolve(path)
-                if not path.is_file():raise ValueError('模型尚未复制或路径不存在')
+                if not path.is_file():
+                    if optional:return
+                    raise ValueError('模型尚未复制或路径不存在')
                 before=path.stat();layout=inspect_ply(path)
                 if not layout.vertex_count or layout.face_count:return
                 records,_=map_ply_vertices(path)
@@ -179,8 +183,8 @@ class Studio:
             try:source=self.paths.resolve(index['source_directory'])
             except (ValueError,KeyError,TypeError) as error:
                 unavailable('source',p,error);continue
-            model(source/'pointclouds/fuse.ply',key,'官方保存融合','official')
-            model(source/'raw_preview.ply',key,'官方扫描预览','preview')
+            model(source/'pointclouds/fuse.ply',key,'官方保存融合','official',optional=True)
+            model(source/'raw_preview.ply',key,'官方扫描预览','preview',optional=True)
         official_report=self.study/'official-fusion-comparison/summary.json'
         if official_report.is_file():
             try:pairs=self.read(official_report).get('pairs',[])
@@ -199,7 +203,7 @@ class Studio:
         for folder in [self.study/'official-fusion-comparison',self.study/'comparison',*sorted((self.study/'experiments').glob('*'))]:
             if not folder.is_dir():continue
             pages=sorted(folder.rglob('*.html'))
-            images=[p for p in [folder/'comparison.png',folder/'evidence-comparison.png',folder/'directions.png'] if p.is_file()]
+            images=[p for p in [folder/'comparison.png',folder/'verified/comparison.png',folder/'evidence-comparison.png',folder/'directions.png'] if p.is_file()]
             if not images:images=sorted(folder.glob('*.png'))[:1]
             experiments.append(dict(id=folder.name,label=LABELS.get(folder.name,folder.name),
                 pages=[dict(label=p.relative_to(folder).as_posix(),url=self.url(p)) for p in pages],
@@ -207,8 +211,10 @@ class Studio:
                 record=self.url(folder/'README.md') if (folder/'README.md').is_file() else None,
                 status=EXPERIMENT_STATUS.get(folder.name,'研究候选 / 对照，需结合证据审阅')))
             preferred=folder/'full-reconstruction/review.html' if folder.name=='cup-direct-split' else folder/'comparison.html' if folder.name in ['official-fusion-comparison','tensor-tsdf'] else folder/'review.html'
+            if (folder/'current-review.html').is_file():preferred=folder/'current-review.html'
+            elif folder.name=='fragment-bridge-20261021' and (folder/'verified/review.html').is_file():preferred=folder/'verified/review.html'
             if preferred.is_file():experiments[-1]['primary_url']=self.url(preferred)
-        priority=['official-fusion-comparison','cup-direct-split','cup-multi-scan-tsdf','cup-roi','tensor-tsdf','cup-first-segment-component']
+        priority=['fragment-bridge-20261021','official-fusion-comparison','cup-direct-split','cup-multi-scan-tsdf','cup-roi','tensor-tsdf','cup-first-segment-component']
         experiments.sort(key=lambda row:(priority.index(row['id']) if row['id'] in priority else len(priority),row['id']))
         for base in [self.study,self.root/'reports/pointcloud-scale-20261019',self.output]:
             for p in sorted(base.rglob('*.html')):

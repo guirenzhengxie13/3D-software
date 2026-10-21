@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-21",
+  "incoming_checkpoint": "20261020T152813Z-cd7578",
+  "incoming_checkpoint_all_17_files_matched": true,
+  "incoming_preservation_commit": "37de939",
+  "original_source_audit": {
+    "projects": 29,
+    "files": 388,
+    "bytes": 3031514347,
+    "all_match_snapshot": true
+  },
+  "scan_id": "scan_20261018131222",
+  "selected_frames": 114,
+  "unselected_frames": 222,
+  "selected_depth_with_frame_ids_sha256": "5c899c637d54df68f358d9bcdb597689ce32b97a08f0d2031de2cd8a8e621736",
+  "execution": "scripted_existing_candidate_replay_not_manual_selection",
+  "same_original_frames_and_roi_pixels": true,
+  "reproductions": [
+    {
+      "label": "saved",
+      "points": 67226,
+      "previous_points": 67226,
+      "full_bidirectional_max_distance_mm": 0.0,
+      "equivalent_within_001mm": true,
+      "meaning": "numerical reproduction of the prior output, not physical scan accuracy"
+    },
+    {
+      "label": "corrected",
+      "points": 66376,
+      "previous_points": 66376,
+      "full_bidirectional_max_distance_mm": 0.0,
+      "equivalent_within_001mm": true,
+      "meaning": "numerical reproduction of the prior output, not physical scan accuracy"
+    }
+  ],
+  "display_verification": {
+    "source": "generated embedded payload -> actual shared PointViewer -> CPU pixels",
+    "cases": [
+      {
+        "display_points": 39032,
+        "visible_pixels": 49545,
+        "width": 800,
+        "height": 600
+      },
+      {
+        "display_points": 38741,
+        "visible_pixels": 47791,
+        "width": 800,
+        "height": 600
+      }
+    ],
+    "actual_browser_verified": false,
+    "actual_gpu_verified": false
+  },
+  "full_python_tests_passed": 154,
+  "node_regressions_passed": 3,
+  "actual_http_to_actual_viewer_cases": 8,
+  "implementation_sha256": {
+    "scripts/check_fragment_bridge_live.py": "b2d308f0db733a4c8035226abea30e749f20c63e1d0a1e690746165795f3b12d",
+    "scripts/build_fragment_plan_from_alignment.py": "539660d64e7cabbc8d8804f5b7e19a6f9d3e4d7a7d178365d7dbc3fac38756e8",
+    "scripts/reconstruct_fragment_plan.py": "137d5602408551d31eba2b1cb78e413fdf2d683ac5b64fbdbb0e94769dea03e8",
+    "src/reconstruction_probe/fragment_bridge.py": "c32eeac924905ef0a5aecd91b9affebfb290ec1f894c8a07172b7b7ca4fae7f0",
+    "src/reconstruction_probe/fragment_plan.py": "caf62970a307c0e8e7490d4b674ff24103f31691609620d196b717d4f48bccc4",
+    "web/studio/point_viewer.js": "fd53987b1bc9c147c65dfb20263f26d1115d71bfdb67fc425ab2d17602139ac7",
+    "scripts/build_studio_comparison.py": "3ee0c4f2ed45d11f14dedec2dde8a600128f28f4549e2ec753dd141774c3e568"
+  },
+  "local_artifacts": "reports/web-studio/sync-20261021/final-bridge",
+  "limitations": [
+    "This reproduces a prior partial result through a new generic execution path; it is not new geometric improvement.",
+    "All 114 selected frames are integrated; previous heldout labels are no longer independent evaluation for these demonstration surfaces.",
+    "Other 222 saved records remain untouched. The full failed 336-record scan is still unresolved.",
+    "The Web manual frame-binding editor, multi-project binding and project undo history remain unimplemented."
+  ]
+}

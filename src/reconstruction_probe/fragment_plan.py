@@ -1,6 +1,13 @@
 """Explicit frame ownership and rigid corrections for offline fragments."""
 
+import hashlib
+import json
+from pathlib import Path
+import re
+
 import numpy as np
+
+from .offline import file_sha256
 
 from .multi_scan import FrameKey, rigid
 
@@ -39,3 +46,27 @@ def compile_fragment_plan(plan, scan_id, index_sha256, available_frame_ids):
         return matrix
     for fragment in fragments:visit(fragment)
     return dict(corrections=corrections,ownership=ownership,selected_frame_ids=sorted(key.frame_id for key in ownership))
+
+
+def load_fragment_inputs(plan_path, index_path, mapper):
+    """Keep hashes of the exact parsed bytes and the expected referenced inputs.
+
+    Re-hashing after validating must never replace an expected pin with a new
+    revision that appeared between the checks. Fusion rechecks these same pins
+    before it can publish a completed result.
+    """
+    plan_path=mapper.resolve(plan_path);index_path=mapper.resolve(index_path)
+    plan_bytes=plan_path.read_bytes();index_bytes=index_path.read_bytes()
+    plan=mapper.record(json.loads(plan_bytes.decode('utf-8')))
+    index=json.loads(index_bytes.decode('utf-8'))
+    if not isinstance(plan,dict) or not isinstance(index,dict):raise ValueError('Expected plan and index objects')
+    pins={str(plan_path):hashlib.sha256(plan_bytes).hexdigest(),str(index_path):hashlib.sha256(index_bytes).hexdigest()}
+    references=plan.get('input_sha256',{})
+    if not isinstance(references,dict):raise ValueError('Fragment input pins must be a mapping')
+    for name,expected in references.items():
+        if not isinstance(expected,str) or not re.fullmatch('[0-9a-f]{64}',expected):raise ValueError('Expected a lowercase SHA256 input pin')
+        path=mapper.resolve(name);key=str(path)
+        if key in pins and pins[key]!=expected:raise ValueError('Conflicting fragment input pins: '+key)
+        if not path.is_file() or file_sha256(path)!=expected:raise ValueError('Fragment-plan reference changed: '+key)
+        pins[key]=expected
+    return plan,index,pins

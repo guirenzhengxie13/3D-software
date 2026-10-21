@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 
-TITLES = {'multi_scan.fuse':'多工程原始深度融合', 'multi_scan.evidence':'各扫描的支持与冲突',
+TITLES = {'fragments.plan':'核对表面与原帧归属', 'fragments.fuse':'片段原深度重融合', 'multi_scan.fuse':'多工程原始深度融合', 'multi_scan.evidence':'各扫描的支持与冲突',
     'multi_scan.trace':'表面点回查原帧', 'multi_scan.pixel_sensitivity':'像素邻域敏感性',
     'multi_scan.local_planes':'轴向差与局部表面距离', 'landmarks.align':'对应点配准',
     'cloud.preview':'空间预览与原顶点映射','cloud.index':'局部完整点云索引','cloud.region':'按需读取局部原始顶点'}
@@ -19,6 +19,11 @@ def read(path):
 
 
 def describe(summary, tool):
+    if tool=='fragments.plan':
+        return f"核对 {summary['selected_frames']} 帧，固定 {summary['target_frames']} 帧、移动 {summary['source_frames']} 帧，绑定 {summary['pinned_files']} 份输入哈希；计划尚不是融合结果。"
+    if tool=='fragments.fuse':
+        arm='原保存位姿控制组' if summary['saved_control'] else '片段校正候选'
+        return f"{arm}，积分 {summary['selected_frames']} 条原始深度，生成 {summary['quality']['point_count']:,} 点。物理精度仍需独立证据。"
     if tool=='multi_scan.evidence':
         rows=summary['surface_results'];joint=next(r for r in rows if r['label']=='joint_raw_depth');n=joint['sample_count']
         return f"联合表面抽样 {n:,} 点：双方支持 {joint['category_counts']['both_projects_support']/n:.1%}，有重复冲突 {joint['repeated_conflict_samples']/n:.1%}。这是同源内部诊断。"

@@ -51,6 +51,13 @@ class StudioMigrationTests(unittest.TestCase):
         self.assertEqual(project['present_frames'],1);self.assertEqual(project['ready_frame_ordinals'],[0])
         for path,content in before.items():self.assertEqual(path.read_bytes(),content)
 
+    def test_optional_vendor_exports_are_not_reported_as_failed_copies(self):
+        self.official.unlink()
+        studio=Studio(self.root)
+        optional={str(self.official),str(self.capture/'raw_preview.ply')}
+        self.assertFalse(any(row['path'] in optional for row in studio.catalog['availability']['missing']))
+        self.assertTrue(any(row['kind']=='frames' for row in studio.catalog['availability']['missing']), 'required missing frames stay visible')
+
     def test_old_lod_metadata_is_used_while_its_bytes_and_hash_remain_unchanged(self):
         folder=self.root/'reports/pointcloud-scale-20261019/lod/cache';folder.mkdir(parents=True)
         np.savez_compressed(folder/'preview-data.npz',original_vertex_ids=np.arange(4,dtype=np.uint64),xyz_mm=self.xyz,rgb=self.rgb)

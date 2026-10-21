@@ -14,7 +14,7 @@ from PIL import Image,ImageDraw,ImageFont
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--port',type=int,default=8877);parser.add_argument('--node',default='C:/Program Files/nodejs/node.exe');args=parser.parse_args();root=Path(__file__).resolve().parents[1]
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--port',type=int,default=8877);parser.add_argument('--node',default='C:/Program Files/nodejs/node.exe');parser.add_argument('--out',type=Path,help='New report folder within workspace/reports');args=parser.parse_args();root=Path(__file__).resolve().parents[1]
     def get(path):
         c=http.client.HTTPConnection('127.0.0.1',args.port,timeout=90);c.request('GET',path);r=c.getresponse();body=r.read();c.close()
         if r.status!=200:raise ValueError(str((r.status,body[:500])))
@@ -29,7 +29,9 @@ def main():
         ('失败扫描片段',lambda m:'segment-2-training-mm.ply' in m['path'])]:
         model=next(m for m in models if predicate(m));cases.append((label,'/api/cloud?id='+model['id']))
     cases.extend([('彩色原帧','/api/frame?scan=scan_20261018122607&ordinal=0'),('失败杯子原帧','/api/frame?scan=scan_20261018131359&ordinal=0')])
-    out=root/'reports/web-studio/render-fix-20261020';out.mkdir(parents=True,exist_ok=True);cache=root/'.cache';cache.mkdir(exist_ok=True);rows=[]
+    out=(root/'reports/web-studio/render-fix-20261020') if args.out is None else args.out.resolve()
+    if root/'reports' not in out.parents or (args.out is not None and out.exists()):raise ValueError('Use a new report directory strictly within workspace/reports')
+    out.mkdir(parents=True,exist_ok=True);cache=root/'.cache';cache.mkdir(exist_ok=True);rows=[]
     with tempfile.TemporaryDirectory(prefix='actual-render-payload-',dir=cache) as temporary:
         temporary=Path(temporary).resolve()
         if cache.resolve() not in temporary.parents:raise ValueError('Unexpected temporary directory')

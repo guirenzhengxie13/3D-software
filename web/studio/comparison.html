@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>三维重建 · 两组结果对照</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:;">
+<style>
+:root{color-scheme:dark;font:15px/1.6 system-ui,'Microsoft YaHei',sans-serif;color:#e1edf9;background:#0c1420}*{box-sizing:border-box}body{margin:0}header{padding:18px 24px;border-bottom:1px solid #30445b}h1{font-size:21px;margin:0 0 8px}p{margin:6px 0;color:#afc2d6}button,select{font:inherit;color:inherit;background:#20354c;border:1px solid #4c6681;border-radius:6px;padding:6px 10px}button{cursor:pointer}nav{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}main{padding:18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}article{min-width:0;background:#152336;border:1px solid #334b65;border-radius:9px;overflow:hidden}article h2{font-size:17px;margin:12px 15px 4px}.stats,.pick{font-size:12px;margin:5px 15px 10px;color:#b6cee5}.pane{position:relative;height:clamp(340px,62vh,720px);background:#0c1420}.pane canvas{display:block;width:100%;height:100%;touch-action:none}.badge{position:absolute;left:12px;top:12px;padding:3px 8px;border-radius:5px;background:#172b43dc;font-size:12px;pointer-events:none}.pick{min-height:38px;overflow-wrap:anywhere}footer{padding:0 22px 22px;font-size:12px;color:#a5bcd3}#error{color:#ffb3a1;white-space:pre-wrap}@media(max-width:780px){main{grid-template-columns:1fr}.pane{height:420px}header{padding:14px}}
+</style></head><body><header><h1 id="title"></h1><p id="notes"></p><p id="frame"></p><nav>
+<label>显示 <select id="color"><option value="original">原始色</option><option value="depth" selected>视深伪彩</option><option value="height">高度伪彩</option><option value="mono">单色</option></select></label>
+<label>视角 <select id="view"><option value="perspective">透视</option><option value="front">正面</option><option value="side">侧面</option><option value="top">顶面</option></select></label>
+<label><input id="linked" type="checkbox" checked>联动相机</label><button id="fit">共同范围适配</button><button id="software">Canvas兼容显示</button>
+</nav><p id="error"></p></header><main id="panels"></main><footer>拖动旋转，Shift+拖动平移，滚轮缩放，点击回查当前模型的原顶点编号。显示采用实际原顶点的空间抽样。伪彩按各模型归一化，仅用于观察形状；两组点数或连通性变化不能独自证明精度提升。</footer>
+<script id="comparison-data" type="application/json">__PAYLOAD__</script>
+<script>__MATH__</script><script>__RASTER__</script><script>__VIEWER__</script>
+<script>
+'use strict';
+try{
+ const data=JSON.parse(document.getElementById('comparison-data').textContent),$=id=>document.getElementById(id),viewers=[];let active=0,lastCamera='';
+ $('title').textContent=data.title;$('notes').textContent=data.notes;$('frame').textContent='共同坐标：'+data.commonFrame+'；单位：mm。';
+ data.clouds.forEach((row,i)=>{const panel=document.createElement('article'),heading=document.createElement('h2'),stats=document.createElement('div'),pane=document.createElement('div'),canvas=document.createElement('canvas'),badge=document.createElement('span'),pick=document.createElement('div');
+  heading.textContent=row.label;stats.className='stats';stats.textContent='完整 '+row.originalPoints.toLocaleString()+' 点 · 显示 '+row.displayPoints.toLocaleString()+' 个原顶点';pane.className='pane';badge.className='badge';pick.className='pick';pick.textContent='尚未选择原顶点';canvas.setAttribute('aria-label',row.label+'，三维点云');
+  pane.append(canvas,badge);panel.append(heading,stats,pane,pick);$('panels').append(panel);
+  const viewer=new PointViewer(canvas,badge,p=>{pick.textContent='原顶点 #'+p.id+' · XYZ '+p.xyz.map(x=>x.toFixed(3)).join(', ')+' mm';});viewer.setClouds([row]);viewer.setColorMode('depth');viewers.push(viewer);
+  pane.addEventListener('pointerdown',()=>{active=i;lastCamera='';});pane.addEventListener('wheel',()=>{active=i;lastCamera='';},{passive:true});
+ });
+ function sharedBounds(){const [lo,hi]=data.boundsMm;viewers.forEach(v=>{v.camera.target=lo.map((x,i)=>(x+hi[i])/2);v.camera.radius=Math.max(Math.hypot(...hi.map((x,i)=>x-lo[i]))/2,.1);v.camera.distance=v.camera.radius*2.9*Math.max(1,v.canvas.clientHeight/Math.max(1,v.canvas.clientWidth));v.dirty=true;});lastCamera='';}
+ $('color').onchange=()=>viewers.forEach(v=>v.setColorMode($('color').value));
+ $('view').onchange=()=>{viewers.forEach(v=>v.setView($('view').value));sharedBounds();};$('fit').onclick=sharedBounds;
+ $('software').onclick=()=>viewers.forEach(v=>v.enableSoftware());$('linked').onchange=()=>{lastCamera='';};
+ function link(){requestAnimationFrame(link);const current=JSON.stringify(viewers[active].camera);if($('linked').checked&&current!==lastCamera){viewers.forEach((v,i)=>{if(i!==active){v.camera=JSON.parse(current);v.dirty=true;}});}lastCamera=current;}
+ sharedBounds();requestAnimationFrame(link);
+}catch(error){document.getElementById('error').textContent='对照页初始化失败：'+error.message;}
+</script></body></html>
