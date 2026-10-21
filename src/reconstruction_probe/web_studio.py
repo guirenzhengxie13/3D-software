@@ -28,6 +28,7 @@ from .offline import file_sha256
 from .ply_layout import inspect_ply, map_ply_vertices
 from .ply_spatial_index import PlySpatialIndex
 from .spatial_lod import budgeted_spatial_preview
+from .path_mapping import PathMapper
 
 
 def read(path):
@@ -71,36 +72,86 @@ EXPERIMENT_STATUS={
 class Studio:
     def __init__(self, workspace):
         self.root = Path(workspace).resolve()
+        self.paths = PathMapper(self.root)
         self.study = self.root/'reports/range2-study-20261018'
         self.output = self.root/'reports/web-studio/runs'
         self.lock = threading.RLock()
+        self.refresh_lock = threading.Lock()
         self.processing = threading.Semaphore(1)
         self.cache = OrderedDict()
         self.jobs = {}
+        self.restore_issues = []
         for record in self.output.glob('*/job.json'):
-            job=read(record)
-            if job.get('id')==record.parent.name and Path(job.get('folder','')).resolve()==record.parent.resolve():
+            try:
+                job=self.read(record)
+                if job.get('id')!=record.parent.name or self.paths.resolve(job.get('folder',''))!=record.parent.resolve():
+                    raise ValueError('历史任务目录与记录不一致')
+                if job.get('status') in ['queued','running']:
+                    job.update(restored_status=job['status'],status='interrupted',error='任务来自先前服务，未自动重新执行')
                 self.jobs[job['id']]=job
+            except (ValueError,KeyError,TypeError,OSError) as error:
+                self.restore_issues.append(dict(kind='job',path=str(record),reason=str(error)))
         self.refresh()
+
+    def read(self, path):
+        return self.paths.record(read(self.paths.resolve(path)))
 
     def url(self, path):
         return '/' + Path(path).resolve().relative_to(self.root).as_posix()
 
     def refresh(self):
-        projects=[]; indices={}; models={}; page_registry={}
+        with self.refresh_lock:
+            return self._refresh()
+
+    def _refresh(self):
+        projects=[]; indices={}; models={}; page_registry={}; missing=list(self.restore_issues)
+        def unavailable(kind,path,error):
+            missing.append(dict(kind=kind,path=str(path),reason=str(error)))
         for decoded in [self.study/'decoded', self.root/'reports/four-scans/decoded']:
             for p in sorted(decoded.glob('*/index.json')):
-                index=read(p); key=index['scan_id']; indices[key]=(p,index)
+                try:
+                    index=self.read(p); key=index['scan_id']; frames=index['frames']; status=index['status']
+                    if not isinstance(frames,list) or not isinstance(key,str) or not isinstance(status,dict):raise ValueError('工程索引格式不完整')
+                    present=[]
+                    for ordinal,frame in enumerate(frames):
+                        rid=frame['id']
+                        if type(rid) is not int or rid<0:raise ValueError('保存帧编号无效')
+                        source=p.parent/f'frame_{rid:010d}'/'frame.npz'
+                        try:
+                            if source.is_file() and source.stat().st_size>0:present.append(ordinal)
+                        except OSError:pass
+                    indices[key]=(p,index)
+                except (ValueError,KeyError,TypeError,OSError) as error:
+                    unavailable('index',p,error);continue
                 short=key.replace('scan_','');label=f'{short[:4]}-{short[4:6]}-{short[6:8]} · {short[8:10]}:{short[10:12]}:{short[12:14]}' if re.fullmatch(r'\d{14}',short) else short
-                projects.append(dict(id=key,label=label,frames=len(index['frames']),
-                    observations=index['status']['valid_depth_points'],colored=index['status'].get('colored_depth_frames',0),
-                    poses=index['status'].get('optimized_poses_parsed',index['status'].get('poses_parsed',0)),
+                projects.append(dict(id=key,label=label,frames=len(frames),present_frames=len(present),ready_frame_ordinals=present,
+                    frame_availability='file_presence_only_not_decoded',
+                    observations=status.get('valid_depth_points',0),colored=status.get('colored_depth_frames',0),
+                    poses=status.get('optimized_poses_parsed',status.get('poses_parsed',0)),
                     cohort='Range 2 新批次' if decoded.parent==self.study else '早期四份工程'))
+                if len(present)<len(frames):unavailable('frames',p.parent,f'{len(frames)-len(present)}份保存帧文件尚不可用')
         def model(path, scan_id=None, label=None, role='candidate'):
-            path=Path(path).resolve()
-            if not path.is_file():return
-            layout=inspect_ply(path)
-            if not layout.vertex_count or layout.face_count:return
+            try:
+                path=self.paths.resolve(path)
+                if not path.is_file():raise ValueError('模型尚未复制或路径不存在')
+                before=path.stat();layout=inspect_ply(path)
+                if not layout.vertex_count or layout.face_count:return
+                records,_=map_ply_vertices(path)
+                sample=records[np.linspace(0,len(records)-1,min(64,len(records)),dtype=int)]
+                xyz=np.column_stack([sample[name] for name in ['x','y','z']])
+                if not np.isfinite(xyz).all():raise ValueError('模型抽样坐标不完整')
+                if len(records)>128:
+                    tail=np.column_stack([records[name][-16:] for name in ['x','y','z']])
+                    if not np.any(tail):raise ValueError('模型尾部尚未写入，等待复制完成')
+                has_rgb={'red','green','blue'}<=set(records.dtype.names or [])
+                rgb=record_rgb(sample,np.arange(len(sample))) if has_rgb else None
+                color_kind=('none' if rgb is None else 'constant' if np.all(rgb==rgb[0]) else
+                            'grayscale' if np.all(rgb[:,0]==rgb[:,1]) and np.all(rgb[:,1]==rgb[:,2]) else 'colored')
+                del records
+                if (before.st_size,before.st_mtime_ns)!=(path.stat().st_size,path.stat().st_mtime_ns):
+                    raise ValueError('模型正在复制或发生变化')
+            except (ValueError,KeyError,TypeError,OSError) as error:
+                unavailable('model',path,error);return
             identifier=hashlib.sha256(str(path).encode()).hexdigest()[:20]
             if identifier in models:return
             rel=path.relative_to(self.root).as_posix() if self.root in path.parents else path.name
@@ -118,23 +169,31 @@ class Studio:
                     elif any(s in path.parts for s in ['cup-segment-pose-graph','cup-first-segment-component']):scan_id='scan_20261018131222'
             models[identifier]=dict(id=identifier,path=str(path),scan_id=scan_id,
                 label=label or rel.replace('reports/range2-study-20261018/','').replace('/tsdf_pointcloud_mm.ply',''),
-                points=layout.vertex_count,bytes=path.stat().st_size,role=role,unit='mm')
+                points=layout.vertex_count,bytes=before.st_size,role=role,unit='mm',has_rgb=has_rgb,
+                color_kind=color_kind,color_sample_points=len(sample))
         for base in [self.study,self.root/'reports/four-scans',self.root/'reports/web-studio/runs']:
             for p in sorted(base.rglob('*.ply')):
                 if p.name=='tsdf_pointcloud_mm.ply' or re.fullmatch(r'segment-\d+-training-mm.ply',p.name) or p.name.endswith('-aligned-mm.ply'):
                     model(p,role='baseline' if p.parent.parent==base/'reconstruction' else 'candidate')
         for key,(p,index) in indices.items():
-            source=Path(index['source_directory'])
+            try:source=self.paths.resolve(index['source_directory'])
+            except (ValueError,KeyError,TypeError) as error:
+                unavailable('source',p,error);continue
             model(source/'pointclouds/fuse.ply',key,'官方保存融合','official')
             model(source/'raw_preview.ply',key,'官方扫描预览','preview')
         official_report=self.study/'official-fusion-comparison/summary.json'
         if official_report.is_file():
-            for pair in read(official_report).get('pairs',[]):
+            try:pairs=self.read(official_report).get('pairs',[])
+            except (ValueError,TypeError,OSError) as error:
+                unavailable('report',official_report,error);pairs=[]
+            for pair in pairs:
                 key=pair.get('scan_id')
                 if key not in indices or pair.get('metadata',{}).get('referenceKind')!='saved-fusion':continue
-                source=(Path(indices[key][1]['source_directory'])/'pointclouds').resolve()
+                try:source=self.paths.resolve(indices[key][1]['source_directory'])/'pointclouds'
+                except (ValueError,KeyError,TypeError):continue
                 for name in pair.get('source_sha256',{}):
-                    path=Path(name).resolve()
+                    try:path=self.paths.resolve(name)
+                    except (ValueError,TypeError):continue
                     if source in path.parents:model(path,key,'官方保存融合','official')
         experiments=[]; workbenches=[]
         for folder in [self.study/'official-fusion-comparison',self.study/'comparison',*sorted((self.study/'experiments').glob('*'))]:
@@ -154,13 +213,19 @@ class Studio:
         for base in [self.study,self.root/'reports/pointcloud-scale-20261019',self.output]:
             for p in sorted(base.rglob('*.html')):
                 if 'workbench' not in p.name:continue
-                text=p.read_text(encoding='utf-8'); match=re.search(r'<script id="alignment-data" type="application/json">(.*?)</script>',text,re.S)
-                if not match:continue
-                data=json.loads(match[1]); identifier=hashlib.sha256(str(p).encode()).hexdigest()[:16]
+                try:
+                    data=self.workbench_data(p.read_text(encoding='utf-8'))
+                    if data is None:continue
+                    for c in data['clouds']:
+                        c['path']=str(self.paths.resolve(c['path']))
+                        if type(c['originalPoints']) is not int or c['originalPoints']<0:raise ValueError('工作台点数无效')
+                    identifier=hashlib.sha256(str(p).encode()).hexdigest()[:16]
+                except (ValueError,KeyError,TypeError,OSError) as error:
+                    unavailable('workbench',p,error);continue
                 item=dict(id=identifier,label=p.parent.name if p.name=='workbench.html' else p.stem,
                     url=self.url(p),models=[dict(path=c['path'],points=c['originalPoints']) for c in data['clouds']])
                 workbenches.append(item);page_registry[identifier]=dict(path=p,data=data)
-                for c in data['clouds']:model(Path(c['path']),label='对应点片段 · '+c['label'])
+                for c in data['clouds']:model(c['path'],label='对应点片段 · '+c.get('label','模型'))
                 item['scan_ids']=sorted({m['scan_id'] for m in models.values() if m['scan_id'] is not None and m['path'] in {str(Path(c['path']).resolve()) for c in data['clouds']}})
                 if base==self.output:item['label']='自选模型对应点 · '+p.parent.parent.name[:8]
                 elif re.fullmatch(r'segment-\d+-to-\d+',item['label']):
@@ -176,9 +241,31 @@ class Studio:
                      dict(label='早期四工程结果',url='/reports/four-scans/review.html')],
             summary=dict(frames=sum(p['frames'] for p in projects),observations=sum(p['observations'] for p in projects),
                          projects=len(projects),models=len(models)),
-            default_scan='scan_20261018122607',unit='mm',model_service_connected=False)
+            default_scan='scan_20261018122607' if 'scan_20261018122607' in indices else next(iter(indices),None),
+            unit='mm',model_service_connected=False,
+            availability=dict(missing=missing,missing_items=len(missing),frame_check='existence_and_size_only',
+                              present_frames=sum(p['present_frames'] for p in projects)))
         with self.lock:self.indices=indices;self.models=models;self.pages=page_registry;self.catalog=catalog
         return catalog
+
+    def workbench_data(self, text):
+        match=re.search(r'<script id="alignment-data" type="application/json">(.*?)</script>',text,re.S)
+        if not match:return None
+        if match[1].strip()=='__DATA__':return None
+        if '\x00' in text:raise ValueError('工作台文件尚未复制完整')
+        data=self.paths.record(json.loads(match[1]))
+        if not isinstance(data,dict) or not isinstance(data.get('clouds'),list):raise ValueError('工作台数据格式不完整')
+        return data
+
+    def static_bytes(self, path):
+        payload=path.read_bytes()
+        if path.suffix.lower()!='.html' or b'id="alignment-data"' not in payload:return payload
+        text=payload.decode('utf-8');data=self.workbench_data(text)
+        if data is None:return payload
+        for cloud in data['clouds']:cloud['path']=str(self.paths.resolve(cloud['path']))
+        encoded=json.dumps(data,ensure_ascii=False,separators=(',',':'),allow_nan=False).replace('&','\\u0026').replace('<','\\u003c').replace('>','\\u003e')
+        return re.sub(r'(<script id="alignment-data" type="application/json">).*?(</script>)',
+                      lambda match:match[1]+encoded+match[2],text,count=1,flags=re.S).encode('utf-8')
 
     def cloud(self, identifier, budget=40000):
         if identifier not in self.models:raise ValueError('模型不在当前目录清单中')
@@ -189,9 +276,11 @@ class Studio:
         with self.processing:
             cached=None
             for manifest in (self.root/'reports/pointcloud-scale-20261019/lod').glob('*/summary.json'):
-                m=read(manifest)
-                if Path(m['source_path'])==source and m['preview_points']<=budget:
-                    cached=load_lod_cache(manifest.parent,source,budget,verify_original_rows=True);break
+                try:
+                    m=self.read(manifest)
+                    if self.paths.resolve(m['source_path'])==source and m['preview_points']<=budget:
+                        cached=load_lod_cache(manifest.parent,source,budget,verify_original_rows=True);break
+                except (ValueError,KeyError,TypeError,OSError):continue
             if cached:xyz,rgb,ids=cached['xyz'],cached['rgb'],cached['ids'];selection='空间预览缓存 · 原编号保留'
             else:
                 records,_=map_ply_vertices(source);preview=budgeted_spatial_preview(records,budget);ids=preview['ids']
@@ -209,6 +298,7 @@ class Studio:
         path,index=self.indices[scan_id];frames=index['frames']
         if not 0<=ordinal<len(frames):raise ValueError('帧序号超出范围')
         frame=frames[ordinal];folder=path.parent/f"frame_{frame['id']:010d}"
+        if not (folder/'frame.npz').is_file():raise ValueError('这份保存帧尚未复制完成，请刷新目录或选择可用帧')
         with np.load(folder/'frame.npz',allow_pickle=False) as saved:
             depth=saved['depth_mm'];valid=np.flatnonzero(depth.ravel()>0);chosen=np.linspace(0,len(valid)-1,min(25000,len(valid)),dtype=int);pixels=valid[chosen]
             colors=saved['rgba'][chosen,:3].copy() if 'rgba' in saved else np.full((len(pixels),3),180,np.uint8)
@@ -230,7 +320,13 @@ class Studio:
         candidates=[*(self.root/'reports/pointcloud-scale-20261019/spatial-index').glob('*/index/summary.json'),
                     *(self.root/'reports/pointcloud-scale-20261019/workflow-spatial-run/nodes').glob('*/summary.json'),
                     *self.output.glob('*/result/nodes/index/summary.json')]
-        manifest=next((p for p in candidates if read(p).get('kind')=='original_ply_vertex_tile_index' and read(p).get('source_sha256')==digest),None)
+        manifest=None
+        for p in candidates:
+            try:
+                metadata=self.read(p)
+                if metadata.get('kind')=='original_ply_vertex_tile_index' and metadata.get('source_sha256')==digest:
+                    manifest=p;break
+            except (ValueError,TypeError,OSError):continue
         if manifest is None:raise ValueError('这份模型尚未建立局部索引，请先点击“生成空间缓存与局部索引”')
         with PlySpatialIndex(manifest.parent,source) as index:
             if not 0<=vertex<len(index.records):raise ValueError('原点编号超出范围')
@@ -243,8 +339,10 @@ class Studio:
 
     def depth_image(self, scan_id, ordinal):
         from PIL import Image
-        path,index=self.indices[scan_id];frame=index['frames'][ordinal]
+        if scan_id not in self.indices:raise ValueError('未知工程')
+        path,index=self.indices[scan_id]
         if not 0<=ordinal<len(index['frames']):raise ValueError('帧序号超出范围')
+        frame=index['frames'][ordinal]
         with np.load(path.parent/f"frame_{frame['id']:010d}"/'frame.npz',allow_pickle=False) as saved:depth=saved['depth_mm']
         valid=depth>0;low,high=np.percentile(depth[valid],[2,98]) if valid.any() else (0,1)
         value=np.clip((depth-low)/max(high-low,1e-6),0,1);rgb=np.stack((255*value,220*(1-np.abs(value-.5)*2),255*(1-value)),axis=-1).astype(np.uint8);rgb[~valid]=[12,20,32]
@@ -272,15 +370,26 @@ class Studio:
         elif kind=='alignment':
             session=request.get('session')
             if not isinstance(session,dict):raise ValueError('需要对应点会话 JSON')
+            session=self.paths.record(session)
             allowed={Path(m['path']).resolve() for m in self.models.values()}
             for name in ['source','target']:
-                if Path(session[name]['path']).resolve() not in allowed:raise ValueError('会话引用的模型不在当前清单中')
-            references={Path(p['data']['candidateReference']['path']).resolve() for p in self.pages.values()}
-            if session.get('kind')=='existing_candidate' and Path(session['candidate_reference']['path']).resolve() not in references:raise ValueError('已有候选引用不在当前工作台中')
-            prepared={p['data'].get('preparedPath') for p in self.pages.values()}
+                path=self.paths.resolve(session[name]['path'])
+                if path not in allowed:raise ValueError('会话引用的模型不在当前清单中')
+                session[name]['path']=str(path)
+            references={self.paths.resolve(p['data']['candidateReference']['path']) for p in self.pages.values() if p['data'].get('candidateReference',{}).get('path')}
+            reference=session.get('candidate_reference')
+            if session.get('kind')=='existing_candidate' and not isinstance(reference,dict):raise ValueError('已有候选缺少原始记录')
+            if reference:
+                candidate=self.paths.resolve(reference['path'])
+                if candidate not in references:raise ValueError('已有候选引用不在当前工作台中')
+                if file_sha256(candidate)!=reference.get('sha256'):raise ValueError('已有候选记录字节发生变化')
+                reference['path']=str(candidate)
+            prepared={str(self.paths.resolve(p['data']['preparedPath'])) for p in self.pages.values() if p['data'].get('preparedPath')}
+            if session.get('prepared_path') is not None:session['prepared_path']=str(self.paths.resolve(session['prepared_path']))
             if session.get('prepared_path') not in prepared|{None}:raise ValueError('未知片段工程')
             folder.mkdir(parents=True);(folder/'session.json').write_text(json.dumps(session,ensure_ascii=False,indent=2),encoding='utf-8')
-            command=[sys.executable,str(self.root/'scripts/apply_landmark_alignment.py'),'--session',str(folder/'session.json'),'--out',str(folder/'result')]
+            command=[sys.executable,'-m','reconstruction_probe.path_mapping','--workspace',str(self.root),
+                     '--session',str(folder/'session.json'),'--out',str(folder/'result')]
         else:raise ValueError('未知处理工具')
         job=dict(id=job_id,kind=kind,status='queued',created_at=datetime.now(timezone.utc).isoformat(),folder=str(folder),command_argv=command)
         self.jobs[job_id]=job
@@ -293,7 +402,7 @@ class Studio:
                     with (folder/'process.log').open('w',encoding='utf-8') as log:
                         result=subprocess.run(command,cwd=self.root,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=1800)
                     status='completed' if result.returncode==0 else 'failed';job['exit_code']=result.returncode
-                    if (folder/'result/state.json').is_file():status=read(folder/'result/state.json')['status']
+                    if (folder/'result/state.json').is_file():status=self.read(folder/'result/state.json')['status']
                     if kind=='spatial' and (folder/'result/index.html').is_file():job['report']=self.url(folder/'result/index.html')
                     if kind=='workbench' and (folder/'result/workbench.html').is_file():job['report']=self.url(folder/'result/workbench.html')
                     self.refresh()
@@ -307,7 +416,9 @@ class Studio:
         job=dict(self.jobs[identifier]);folder=Path(job['folder']);log=folder/'process.log'
         job['log']=log.read_text(encoding='utf-8',errors='replace')[-14000:] if log.is_file() else ''
         state=folder/'result/state.json'
-        if state.is_file():job['workflow']=read(state)
+        if state.is_file():
+            try:job['workflow']=self.read(state)
+            except (ValueError,TypeError,OSError):job['workflow_unavailable']='任务记录尚未复制完整'
         return job
 
 
@@ -328,7 +439,7 @@ def make_handler(studio):
             if not self.trusted_host():self.send(dict(error='仅允许本机地址'),status=403);return
             parsed=urlsplit(self.path);query=parse_qs(parsed.query);get=lambda key,default=None:query.get(key,[default])[0]
             try:
-                if parsed.path=='/api/catalog':self.send(studio.catalog)
+                if parsed.path=='/api/catalog':self.send(studio.refresh() if get('refresh')=='1' else studio.catalog)
                 elif parsed.path=='/api/cloud':self.send(studio.cloud(get('id'),int(get('budget',40000))))
                 elif parsed.path=='/api/frame':self.send(studio.frame(get('scan'),int(get('ordinal',0))))
                 elif parsed.path=='/api/region':self.send(studio.region(get('id'),int(get('vertex')),float(get('radius_mm',5))))
@@ -345,7 +456,7 @@ def make_handler(studio):
                     if studio.output in path.parents and path.name in ['session.json','plan.json']:self.send(dict(error='会话文件由任务接口管理'),status=403);return
                     content=mimetypes.guess_type(path.name)[0] or 'text/plain'
                     if path.suffix=='.md':content='text/plain; charset=utf-8'
-                    self.send(path.read_bytes(),content)
+                    self.send(studio.static_bytes(path),content)
             except (ValueError,KeyError,TypeError,IndexError,OSError) as error:self.send(dict(error=str(error)),status=400)
 
         def do_POST(self):

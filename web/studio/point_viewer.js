@@ -5,6 +5,9 @@
  function multiply(a,b){const c=new Float32Array(16);for(let j=0;j<4;j++)for(let i=0;i<4;i++)for(let k=0;k<4;k++)c[j*4+i]+=a[k*4+i]*b[j*4+k];return c;}
  function decode(text,type){if(typeof text!=='string')throw Error('缺少点云编码数据');const bytes=Uint8Array.from(atob(text),x=>x.charCodeAt(0)),v=new DataView(bytes.buffer);if(type==='u8')return bytes;if(bytes.length%4)throw Error('点云编码长度不是4字节的整数倍');return type==='u32'?Uint32Array.from({length:bytes.length/4},(_,i)=>v.getUint32(4*i,true)):Float32Array.from({length:bytes.length/4},(_,i)=>v.getFloat32(4*i,true));}
  const vector=value=>Array.isArray(value)||(ArrayBuffer.isView(value)&&typeof value.length==='number');
+ const colorModes=new Set(['original','depth','height','layer','mono']),layerColors=[[92,190,255],[255,178,93],[165,220,133]];
+ function colorSummary(colors){let constant=true,gray=true;for(let i=0;i<colors.length;i+=3){if(colors[i]!==colors[0]||colors[i+1]!==colors[1]||colors[i+2]!==colors[2])constant=false;if(colors[i]!==colors[i+1]||colors[i]!==colors[i+2])gray=false;}return {constant,gray};}
+ function ramp(t){t=Math.max(0,Math.min(1,t));const stops=[[55,90,220],[45,190,170],[245,220,70]],i=t<.5?0:1,f=t<.5?t*2:(t-.5)*2;return stops[i].map((v,j)=>Math.round(v+(stops[i+1][j]-v)*f));}
  function decodePayload(row){
   // A scalar catalog count must never shadow base64 coordinate arrays.
   const points=vector(row.points)?Float32Array.from(row.points):decode(row.xyz,'f32');
@@ -15,7 +18,7 @@
   return {...row,points,colors,originalIds};
  }
  class PointViewer{
-  constructor(canvas,badge,onPick){this.canvas=canvas;this.badge=badge;this.onPick=onPick;this.clouds=[];this.sourceRows=[];this.gain=1.8;this.size=2.5;this.camera={target:[0,0,0],radius:100,distance:350,yaw:1.2,pitch:.15};this.dirty=true;
+  constructor(canvas,badge,onPick){this.canvas=canvas;this.badge=badge;this.onPick=onPick;this.clouds=[];this.sourceRows=[];this.gain=1;this.colorMode='original';this.size=2.5;this.camera={target:[0,0,0],radius:100,distance:350,yaw:1.2,pitch:.15};this.dirty=true;
    try{this.initGL();this.badge.textContent='WebGL';}catch(error){this.enableSoftware();this.badge.textContent='Canvas 兼容绘制';}
    this.events();this.resizeObserver=typeof ResizeObserver!=='undefined'?new ResizeObserver(()=>{this.dirty=true;}):null;this.resizeObserver?.observe(canvas.parentElement);
    const loop=()=>{requestAnimationFrame(loop);if(this.dirty){this.dirty=false;try{this.draw();}catch(error){if(!this.software){try{this.enableSoftware();return;}catch(fallbackError){error=fallbackError;}}this.badge.textContent='绘制失败：'+error.message;this.lastError=error.message;}}};requestAnimationFrame(loop);
@@ -27,12 +30,27 @@
    gl.useProgram(p);gl.enable(gl.DEPTH_TEST);gl.clearColor(.047,.078,.125,1);this.program=p;this.locations={position:gl.getAttribLocation(p,'aPosition'),color:gl.getAttribLocation(p,'aColor'),matrix:gl.getUniformLocation(p,'uMatrix'),size:gl.getUniformLocation(p,'uSize')};
   }
   enableSoftware(){if(this.ctx)return;const c=document.createElement('canvas');c.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none';this.canvas.parentElement.insertBefore(c,this.canvas);this.canvas.style.opacity='0';this.canvas.style.position='relative';this.canvas.style.zIndex='1';this.fallback=c;this.ctx=c.getContext('2d');this.software=true;this.badge.textContent='Canvas 兼容绘制';this.dirty=true;}
-  setGain(value){this.gain=Math.max(1,Math.min(4,value));this.setClouds(this.sourceRows,false);}
-  setClouds(rows,fit=true){this.sourceRows=rows;if(this.gl)for(const old of this.clouds){if(old.gpu){this.gl.deleteBuffer(old.gpu[0]);this.gl.deleteBuffer(old.gpu[1]);}}
-   this.clouds=rows.map((row,i)=>{const c=decodePayload(row);
-    if(rows.length>1){const tint=i===0?[92,190,255]:[255,178,93];c.colors=new Uint8Array(c.colors.length);for(let j=0;j<c.colors.length;j+=3)c.colors.set(tint,j);}else c.colors=Uint8Array.from(c.colors,value=>Math.min(255,Math.round(value*this.gain)));
-    if(this.gl&&!this.software){const gl=this.gl;c.gpu=[c.points,c.colors].map(a=>{const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,a,gl.STATIC_DRAW);return b;});}return c;});if(fit)this.fit();this.dirty=true;
+  setGain(value){this.gain=Math.max(1,Math.min(4,value));this.updateColors();}
+  setColorMode(mode){if(!colorModes.has(mode))throw Error('未知显示颜色方式');this.colorMode=mode;this.updateColors();}
+  updateColors(){const mode=this.colorMode,direction=this.direction(),scalar=p=>mode==='height'?-p[0]:dot(p,direction);let lo=Infinity,hi=-Infinity;
+   if(mode==='height'||mode==='depth')for(const c of this.clouds)for(let i=0;i<c.points.length;i+=3){const value=scalar(c.points.subarray(i,i+3));lo=Math.min(lo,value);hi=Math.max(hi,value);}
+   for(let n=0;n<this.clouds.length;n++){const c=this.clouds[n],colors=new Uint8Array(c.sourceColors.length);for(let i=0;i<colors.length;i+=3){let color;
+     if(mode==='original')color=c.sourceColors.subarray(i,i+3);else if(mode==='layer')color=layerColors[n%layerColors.length];else if(mode==='mono')color=[185,205,220];else color=ramp(hi>lo?(scalar(c.points.subarray(i,i+3))-lo)/(hi-lo):.5);
+     for(let j=0;j<3;j++)colors[i+j]=Math.min(255,Math.round(color[j]*this.gain));}c.colors=colors;
+    if(c.gpu&&!this.software){const gl=this.gl;gl.bindBuffer(gl.ARRAY_BUFFER,c.gpu[1]);gl.bufferData(gl.ARRAY_BUFFER,colors,gl.STATIC_DRAW);}}
+   this.colorDirectionKey=direction.join(',');this.dirty=true;
   }
+  colorDescription(){const descriptions={original:'原始颜色；增亮仅影响显示。',depth:'视深伪彩：蓝远、黄近，随旋转更新，不是真实颜色。',height:'高度伪彩：按工程 −X 轴着色，蓝低、黄高，不是真实颜色。',layer:'图层着色：蓝、橙、绿区分来源，不表示质量优劣。',mono:'单色显示，仅用于观察几何。'},notes=[];
+   if(this.clouds.some(c=>c.has_rgb===false))notes.push('有模型未保存 RGB，灰色为显示占位色。');
+   if(this.clouds.some(c=>c.has_rgb!==false&&c.colorSummary.constant&&c.colorSummary.gray))notes.push('当前预览只有统一灰度，不能提供纹理细节；可切换视深或高度伪彩观察形状。');
+   else if(this.clouds.some(c=>c.has_rgb!==false&&c.colorSummary.gray))notes.push('当前预览是灰度颜色。');
+   return notes.concat(descriptions[this.colorMode]).join(' ');
+  }
+  setClouds(rows,fit=true){this.sourceRows=rows;if(this.gl)for(const old of this.clouds){if(old.gpu){this.gl.deleteBuffer(old.gpu[0]);this.gl.deleteBuffer(old.gpu[1]);}}
+   this.clouds=rows.map(row=>{const c=decodePayload(row);c.sourceColors=c.colors;c.colorSummary=colorSummary(c.sourceColors);
+    if(this.gl&&!this.software){const gl=this.gl;c.gpu=[c.points,c.colors].map(a=>{const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,a,gl.STATIC_DRAW);return b;});}return c;});if(fit)this.fit();this.updateColors();
+  }
+  setView(preset){const views={front:[0,0],side:[Math.PI/2,0],top:[0,1.56],perspective:[1.2,.15]};if(!views[preset])throw Error('未知视角');[this.camera.yaw,this.camera.pitch]=views[preset];this.fit();this.dirty=true;}
   fit(){const lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];for(const c of this.clouds)for(let i=0;i<c.points.length;i++) {const j=i%3;lo[j]=Math.min(lo[j],c.points[i]);hi[j]=Math.max(hi[j],c.points[i]);}if(!Number.isFinite(lo[0]))return;
    this.camera.target=lo.map((x,i)=>(x+hi[i])/2);this.camera.radius=Math.max(Math.hypot(...hi.map((v,i)=>v-lo[i]))/2,.1);this.camera.distance=this.camera.radius*2.9*Math.max(1,this.canvas.clientHeight/Math.max(1,this.canvas.clientWidth));this.dirty=true;
   }
@@ -42,6 +60,7 @@
    return multiply(Float32Array.from([f/(w/h),0,0,0,0,f,0,0,0,0,(far+near)*nf,-1,0,0,2*far*near*nf,0]),v);
   }
   draw(){const c=this.canvas,ratio=Math.min(root.devicePixelRatio||1,this.software?1:2),w=Math.max(1,Math.round(c.clientWidth*ratio)),h=Math.max(1,Math.round(c.clientHeight*ratio));if(c.width!==w)c.width=w;if(c.height!==h)c.height=h;this.mvp=this.matrix(w,h);
+   if(this.colorMode==='depth'&&this.colorDirectionKey!==this.direction().join(','))this.updateColors();
    if(this.software){this.fallback.width=w;this.fallback.height=h;const data=this.ctx.createImageData(w,h);data.data.set(PointRaster.rasterize(this.clouds,this.mvp,w,h,this.size));this.ctx.putImageData(data,0,0);return;}
    const gl=this.gl,l=this.locations;gl.viewport(0,0,w,h);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.uniformMatrix4fv(l.matrix,false,this.mvp);gl.uniform1f(l.size,this.size*ratio);
    for(const cloud of this.clouds){gl.bindBuffer(gl.ARRAY_BUFFER,cloud.gpu[0]);gl.enableVertexAttribArray(l.position);gl.vertexAttribPointer(l.position,3,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ARRAY_BUFFER,cloud.gpu[1]);gl.enableVertexAttribArray(l.color);gl.vertexAttribPointer(l.color,3,gl.UNSIGNED_BYTE,true,0,0);gl.drawArrays(gl.POINTS,0,cloud.points.length/3);}
