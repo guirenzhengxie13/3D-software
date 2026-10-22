@@ -29,6 +29,7 @@ from .ply_layout import inspect_ply, map_ply_vertices
 from .ply_spatial_index import PlySpatialIndex
 from .spatial_lod import budgeted_spatial_preview
 from .path_mapping import PathMapper
+from .web_fragments import FragmentEditorService, save as write_json_record
 
 
 def read(path):
@@ -57,7 +58,7 @@ LABELS = {
     'official-fusion-comparison':'官方融合与自研结果', 'comparison':'原扫描预览与自研结果',
 }
 EXPERIMENT_STATUS={
-    'fragment-bridge-20261021':'114帧真实闭环复现；非新增精度提升，网页帧绑定编辑器仍待实现',
+    'fragment-bridge-20261021':'114帧原深度复现；工程对应点页现可编辑帧归属、核验并运行两组融合',
     'official-fusion-comparison':'已完成同源表面对比；官方输出也不等于物理真值',
     'cup-direct-split':'358帧融合演示减少重复杯柄；孔洞和碎片仍保留',
     'cup-multi-scan-tsdf':'463帧真实联合融合；已回查互补区域和重复冲突',
@@ -94,6 +95,7 @@ class Studio:
             except (ValueError,KeyError,TypeError,OSError) as error:
                 self.restore_issues.append(dict(kind='job',path=str(record),reason=str(error)))
         self.refresh()
+        self.fragments=FragmentEditorService(self)
 
     def read(self, path):
         return self.paths.record(read(self.paths.resolve(path)))
@@ -356,6 +358,11 @@ class Studio:
 
     def start_job(self, request):
         with self.lock:
+            return self._start_job(request)
+
+    def _start_job(self, request):
+        if not isinstance(request,dict):raise ValueError('需要任务对象')
+        with self.lock:
             if any(j['status'] in ['queued','running'] for j in self.jobs.values()):raise ValueError('当前有一个处理任务，请等待或在步骤之间取消')
         kind=request.get('kind');job_id=uuid.uuid4().hex[:16];folder=self.output/job_id
         if kind=='spatial':
@@ -373,6 +380,14 @@ class Studio:
             command=[sys.executable,str(self.root/'scripts/build_landmark_workbench.py'),'--source-cloud',source['path'],'--target-cloud',target['path'],'--unit','mm','--out',str(folder/'result/workbench.html'),
                      '--notes','来自Web工程工作区的自选模型。原始点和模型不覆盖；同一物理位置需人工判断。']
             (folder/'selection.json').write_text(json.dumps(dict(source=source,target=target),ensure_ascii=False,indent=2),encoding='utf-8')
+        elif kind=='fragment_fusion':
+            review_folder,review,review_bytes=self.fragments.load_review(request.get('review_id'),request.get('plan_sha256'),request.get('review_sha256'))
+            folder.mkdir(parents=True)
+            command=[sys.executable,str(self.root/'scripts/run_fragment_fusion_pair.py'),
+                '--decoded',review['decoded'],'--plan',str(review_folder/'fragment-plan.json'),
+                '--plan-sha256',review['plan_sha256'],'--out',str(folder/'result'),'--cancel-file',str(folder/'cancel')]
+            (folder/'binding.json').write_bytes((review_folder/'binding.json').read_bytes())
+            (folder/'review-original.json').write_bytes(review_bytes)
         elif kind=='alignment':
             session=request.get('session')
             if not isinstance(session,dict):raise ValueError('需要对应点会话 JSON')
@@ -398,12 +413,17 @@ class Studio:
                      '--session',str(folder/'session.json'),'--out',str(folder/'result')]
         else:raise ValueError('未知处理工具')
         job=dict(id=job_id,kind=kind,status='queued',created_at=datetime.now(timezone.utc).isoformat(),folder=str(folder),command_argv=command)
+        if kind=='fragment_fusion':
+            job.update(scan_id=review['scan_id'],review_id=review['id'],reviewed_plan_sha256=review['plan_sha256'],reviewed_record_sha256=request['review_sha256'])
+        write_json_record(folder/'job.json',job)
+        if kind=='fragment_fusion':self.fragments.submitted(review_folder,review,job_id,request['review_sha256'])
         self.jobs[job_id]=job
         def run():
             import os
             with self.processing:
                 job['status']='running'
                 try:
+                    write_json_record(folder/'job.json',job)
                     env=dict(os.environ,PYTHONIOENCODING='utf-8',OMP_NUM_THREADS='4')
                     with (folder/'process.log').open('w',encoding='utf-8') as log:
                         result=subprocess.run(command,cwd=self.root,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=1800)
@@ -411,11 +431,18 @@ class Studio:
                     if (folder/'result/state.json').is_file():status=self.read(folder/'result/state.json')['status']
                     if kind=='spatial' and (folder/'result/index.html').is_file():job['report']=self.url(folder/'result/index.html')
                     if kind=='workbench' and (folder/'result/workbench.html').is_file():job['report']=self.url(folder/'result/workbench.html')
+                    if kind=='fragment_fusion':
+                        if (folder/'result/index.html').is_file():job['report']=self.url(folder/'result/index.html')
+                        if (folder/'result/review.html').is_file():
+                            job['workflow_report']=self.url(folder/'result/index.html');job['report']=self.url(folder/'result/review.html')
                     self.refresh()
                     job['status']=status
                 except Exception as error:job['status']='failed';job['error']=str(error)
-                job['finished_at']=datetime.now(timezone.utc).isoformat();(folder/'job.json').write_text(json.dumps(job,ensure_ascii=False,indent=2),encoding='utf-8')
-        threading.Thread(target=run,daemon=True).start();return self.job(job_id)
+                job['finished_at']=datetime.now(timezone.utc).isoformat();write_json_record(folder/'job.json',job)
+        try:threading.Thread(target=run,daemon=True).start()
+        except Exception as error:
+            job.update(status='failed',error=str(error));write_json_record(folder/'job.json',job);raise
+        return self.job(job_id)
 
     def job(self, identifier):
         if identifier not in self.jobs:raise ValueError('未知任务')
@@ -450,6 +477,7 @@ def make_handler(studio):
                 elif parsed.path=='/api/frame':self.send(studio.frame(get('scan'),int(get('ordinal',0))))
                 elif parsed.path=='/api/region':self.send(studio.region(get('id'),int(get('vertex')),float(get('radius_mm',5))))
                 elif parsed.path=='/api/depth.png':self.send(studio.depth_image(get('scan'),int(get('ordinal',0))),'image/png')
+                elif parsed.path=='/api/fragments/context':self.send(studio.fragments.context(get('scan')))
                 elif parsed.path=='/api/jobs':self.send([studio.job(key) for key in studio.jobs])
                 elif parsed.path.startswith('/api/jobs/'):self.send(studio.job(parsed.path.rsplit('/',1)[1]))
                 else:
@@ -473,9 +501,10 @@ def make_handler(studio):
                 if not 0<length<=1000000:raise ValueError('请求大小超过限制')
                 request=json.loads(self.rfile.read(length))
                 if self.path=='/api/jobs':self.send(studio.start_job(request),status=202)
+                elif self.path=='/api/fragments/reviews':self.send(studio.fragments.preview(request),status=201)
                 elif self.path.startswith('/api/jobs/') and self.path.endswith('/cancel'):
                     identifier=self.path.split('/')[3];job=studio.job(identifier)
-                    if job['kind']!='spatial':raise ValueError('该单步任务不支持步骤间取消')
+                    if job['kind'] not in ['spatial','fragment_fusion']:raise ValueError('该单步任务不支持步骤间取消')
                     (Path(job['folder'])/'cancel').touch();self.send(dict(status='cancel_requested_between_steps'))
                 else:self.send(dict(error='未知操作'),status=404)
             except (ValueError,KeyError,TypeError,OSError) as error:self.send(dict(error=str(error)),status=400)

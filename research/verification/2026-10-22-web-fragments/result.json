@@ -1,0 +1,70 @@
+{
+  "status": "actual_web_frame_binding_and_fusion_completed",
+  "scan_id": "scan_20261018131222",
+  "job_id": "465fdb3b59b740b2",
+  "review_id": "25cff0e3c9b74928",
+  "method": "real HTTP APIs used by the form, automated existing-candidate replay, not human UI operation",
+  "selected_frames": 114,
+  "source_frames": 83,
+  "target_frames": 31,
+  "pinned_files": 239,
+  "selected_depth_with_frame_ids_sha256": "5c899c637d54df68f358d9bcdb597689ce32b97a08f0d2031de2cd8a8e621736",
+  "stale_plan_request_rejected_before_execution": true,
+  "comparisons": [
+    {
+      "points": 67226,
+      "previous_points": 67226,
+      "full_bidirectional_max_distance_mm": 0.0
+    },
+    {
+      "points": 66376,
+      "previous_points": 66376,
+      "full_bidirectional_max_distance_mm": 0.0
+    }
+  ],
+  "actual_shared_viewer_cpu_rasters": [
+    {
+      "display_points": 39032,
+      "visible_pixels": 49545,
+      "width": 800,
+      "height": 600
+    },
+    {
+      "display_points": 38741,
+      "visible_pixels": 47791,
+      "width": 800,
+      "height": 600
+    }
+  ],
+  "report_url": "/reports/web-studio/runs/465fdb3b59b740b2/result/review.html",
+  "workflow_report_url": "/reports/web-studio/runs/465fdb3b59b740b2/result/index.html",
+  "actual_browser_verified": false,
+  "actual_gpu_verified": false,
+  "source_files_not_overwritten": true,
+  "implementation_sha256": {
+    "src/reconstruction_probe/web_fragments.py": "d56332cd5abda080c0fc6b5144151c3fd6eac2a0c7fff35c971d0df5107edab4",
+    "src/reconstruction_probe/web_studio.py": "253075c74a653c4fa2b3296ad43b6be2db31d08296fe126570a4d9999b7ed595",
+    "scripts/run_fragment_fusion_pair.py": "803f8cfec1fd132da95f3cbc96109fdaae0563fee5a1c20733a22b96b2a72c7e",
+    "web/studio/fragment_editor.js": "fa7a418ecc11cab443f1c3ae75320c5a389cde09acf36d9f47b3bbb1adbb83ea",
+    "web/studio/app.js": "f270d408406461400365a79c8dddbdb80357bd33ce9076002732de3f73a8be8a",
+    "web/studio/index.html": "996213785f6f3fafd49cb83accfe13e22fc4c1727031faff97193f66421314ed"
+  },
+  "limitations": [
+    "This extends the interface and execution workflow; exact reproduction is not new physical accuracy evidence.",
+    "Only the prior 114-frame component is exercised. The rest of the failed scan remains unresolved.",
+    "Browser interaction is separately tested by the real controller with a simulated DOM; no new Chrome/GPU claim."
+  ],
+  "tests": {
+    "python_unittest": 166,
+    "node_controller_mock_dom": true,
+    "node_fragment_editor_mock_dom": true,
+    "node_point_viewer_cpu": true,
+    "node_landmark_workbench": true
+  },
+  "original_source_integrity": {
+    "projects": 29,
+    "files": 388,
+    "bytes": 3031514347,
+    "all_sha256_match": true
+  }
+}
