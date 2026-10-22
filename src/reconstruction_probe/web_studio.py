@@ -43,6 +43,7 @@ def pack(xyz, rgb, ids):
 
 
 LABELS = {
+    'cup-local-constraints-20261022':'失败扫描 · 局部几何约束与错配风险',
     'fragment-bridge-20261021':'对应点结果到原帧重融合 · 完整链路复现',
     'tensor-tsdf':'精细稀疏融合', 'tensor-weight3':'稀疏融合 · 权重门槛',
     'cup-roi':'杯子选区后重新融合', 'cup-direct-split':'直接对齐两片段',
@@ -58,6 +59,7 @@ LABELS = {
     'official-fusion-comparison':'官方融合与自研结果', 'comparison':'原扫描预览与自研结果',
 }
 EXPERIMENT_STATUS={
+    'cup-local-constraints-20261022':'7条冻结连接的局部谱；结合原深度证据，高局部约束不代表对齐正确',
     'fragment-bridge-20261021':'114帧原深度复现；工程对应点页现可编辑帧归属、核验并运行两组融合',
     'official-fusion-comparison':'已完成同源表面对比；官方输出也不等于物理真值',
     'cup-direct-split':'358帧融合演示减少重复杯柄；孔洞和碎片仍保留',
@@ -216,7 +218,7 @@ class Studio:
             if (folder/'current-review.html').is_file():preferred=folder/'current-review.html'
             elif folder.name=='fragment-bridge-20261021' and (folder/'verified/review.html').is_file():preferred=folder/'verified/review.html'
             if preferred.is_file():experiments[-1]['primary_url']=self.url(preferred)
-        priority=['fragment-bridge-20261021','official-fusion-comparison','cup-direct-split','cup-multi-scan-tsdf','cup-roi','tensor-tsdf','cup-first-segment-component']
+        priority=['fragment-bridge-20261021','cup-local-constraints-20261022','official-fusion-comparison','cup-direct-split','cup-multi-scan-tsdf','cup-roi','tensor-tsdf','cup-first-segment-component']
         experiments.sort(key=lambda row:(priority.index(row['id']) if row['id'] in priority else len(priority),row['id']))
         for base in [self.study,self.root/'reports/pointcloud-scale-20261019',self.output]:
             for p in sorted(base.rglob('*.html')):

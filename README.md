@@ -58,6 +58,7 @@ HANDOFF.md                 当前进度、问题、验收与续接入口
 - [Web工作台使用说明](docs/web-studio.md)
 - [解包到融合的处理链路](docs/offline-reconstruction-pipeline.md)
 - [网页原帧绑定与两组重融合](docs/web-fragment-workflow.md)
+- [局部几何约束与错配诊断](docs/local-constraint-diagnostics.md)
 - [对应点结果到原帧重融合](docs/fragment-fusion-bridge.md)
 - [备份范围与恢复方法](docs/backup-and-restore.md)
 - [仓库内的研究快照](research/snapshots/2026-10-20/README.md)

@@ -1,0 +1,13 @@
+const assert=require('assert/strict'),fs=require('fs'),vm=require('vm');
+class Element{constructor(){this.children=[];this.style={};this.hidden=false;this.textContent='';this.value='';}append(n){this.children.push(n);}replaceChildren(){this.children=[];}}
+const spectrum={correspondences:20,center_mm:[1,2,3],length_mm:15,relative_eigenvalues:[.001,.02,.1,.3,.5,1],eigenvectors_columns:Array.from({length:6},(_,i)=>Array.from({length:6},(_,j)=>+(i===j))),modes_below_relative_one_percent:1,smallest_to_largest_ratio:.001};
+const variant=label=>({label,source_distance_coverage:.5,target_distance_coverage:.6,all_matches:spectrum,common_query_points:{...spectrum,correspondences:12,smallest_to_largest_ratio:.0005}});
+const fixture={edges:[{source:1,target:0,original_training_gate_passed:false,thresholds:Array.from({length:3},()=>({variants:[variant('saved_relative_identity'),variant('geometric_training_candidate')]})),previously_recorded_reserved_depth_2mm:['saved_relative_identity','geometric_training_candidate'].map(label=>({label,supported_points:4,repeated_conflict_points:3,samples:10}))}]};
+function run(page,data){const elements={},$=id=>elements[id]??=new Element();$('constraint-data').textContent=JSON.stringify(data);$('threshold').value='1';$('population').value='all_matches';
+ const context=vm.createContext({document:{getElementById:$,createElement:()=>new Element()},console});for(const match of page.matchAll(/<script>([\s\S]*?)<\/script>/g))vm.runInContext(match[1],context);
+ for(let t=0;t<3;t++)for(const population of ['all_matches','common_query_points']){$('threshold').value=String(t);$('population').value=population;$('population').onchange();assert.equal($('rows').children.length,data.edges.length*2);const row=$('rows').children[1],expected=data.edges[0].thresholds[t].variants[1][population];assert.equal(row.children[5].textContent,expected.smallest_to_largest_ratio.toExponential(3));row.children[7].children[0].onclick();assert.equal($('detail').hidden,false);assert.equal($('spectrum').children.length,6);assert.ok($('mode').textContent.includes('1%'));assert.ok($('geometry').textContent.includes(String(expected.correspondences)));}
+ return data.edges.length;
+}
+const template=fs.readFileSync('web/studio/constraint_diagnostic.html','utf8');assert.equal(run(template,fixture),1);
+let real=null;if(process.argv[2]){const page=fs.readFileSync(process.argv[2],'utf8'),data=JSON.parse(page.match(/<script id="constraint-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);real=run(page,data);assert.equal(real,7);}
+console.log(JSON.stringify({real_controller_with_simulated_dom:true,three_thresholds_two_populations:true,weak_direction_detail:true,actual_report_edges:real,browser_verified:false}));
