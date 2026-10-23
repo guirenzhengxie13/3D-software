@@ -1,0 +1,132 @@
+{
+  "status": "synthetic_landmark_layout_sensitivity_not_scanner_accuracy",
+  "source_points": 13206,
+  "true_transform": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "source_identity": "Original training point IDs; target anchors synthetically perturbed from those same coordinates",
+  "random_seed": 20261023,
+  "common_standard_noise_sha256": "6f50fea3045cf2dbb71c7d14388b8b06dc687fce36c77a9e042d8c9ccf5beb62",
+  "noise_model": "Independent Gaussian target-coordinate perturbations; assumed, not measured user/scanner errors",
+  "new_physical_scans": 0,
+  "reference": "https://pubmed.ncbi.nlm.nih.gov/9874293/",
+  "limitations": [
+    "This is a controlled counterexample with a known identity mapping, not real cross-fragment landmark approval.",
+    "The chosen Gaussian sigma is not a calibrated model of scanner depth noise or human picking uncertainty.",
+    "Farthest-point anchors on a real training cloud are not necessarily identifiable physical landmarks.",
+    "Global RMS displacement compares the same original point IDs under known synthetic truth; it is not nearest-surface distance or an independent real heldout test.",
+    "Only two four-anchor layouts on one existing point cloud are studied. No automatic acceptance threshold, pose correction, or reconstruction is changed."
+  ],
+  "input_sha256": {
+    "reports/range2-study-20261018/experiments/cup-segment-pose-graph/segment-0-training-mm.ply": "0d1b65bda5319a6215a925b6814c1ac4ef489a8348c8c8d58ee2fcf6c152353f",
+    "scripts/analyze_landmark_layout.py": "7ba709c08a9ce68026833b72f25114487092b2680a16622727560e66b8f4c9f9",
+    "src/reconstruction_probe/marker_refinement.py": "f1bde351a193f24dc1d1867a17ffd5465bd3e0f1d6793f5d26ce760636048cbf",
+    "web/studio/landmark_layout_diagnostic.html": "b24f30b1a2d4406b47d31ac75d3b5b5d5d7cb56cc211cc0f294420ad3831a046"
+  },
+  "layouts": [
+    {
+      "label": "wide",
+      "source_point_ids": [
+        12581,
+        1125,
+        4216,
+        10056
+      ],
+      "source_rms_radius_mm": 58.90769742573134,
+      "source_second_to_first_variance_ratio": 0.915819975815259,
+      "results": [
+        {
+          "synthetic_target_coordinate_sigma_mm": 0.1,
+          "trials": 256,
+          "fit_median_mm": 0.11620481407964209,
+          "full_cloud_median_mm": 0.1005980835891461,
+          "full_cloud_p90_mm": 0.14788330006680725,
+          "target_layouts_rejected_by_existing_frontend_ratio": 0
+        },
+        {
+          "synthetic_target_coordinate_sigma_mm": 0.2,
+          "trials": 256,
+          "fit_median_mm": 0.23247215245615932,
+          "full_cloud_median_mm": 0.20109509205035436,
+          "full_cloud_p90_mm": 0.2957538589799525,
+          "target_layouts_rejected_by_existing_frontend_ratio": 0
+        },
+        {
+          "synthetic_target_coordinate_sigma_mm": 0.5,
+          "trials": 256,
+          "fit_median_mm": 0.5816468908092491,
+          "full_cloud_median_mm": 0.5019798150772273,
+          "full_cloud_p90_mm": 0.7391535589346352,
+          "target_layouts_rejected_by_existing_frontend_ratio": 0
+        }
+      ]
+    },
+    {
+      "label": "local",
+      "source_point_ids": [
+        2203,
+        4375,
+        6056,
+        7488
+      ],
+      "source_rms_radius_mm": 1.955439314436168,
+      "source_second_to_first_variance_ratio": 0.7115884934643647,
+      "results": [
+        {
+          "synthetic_target_coordinate_sigma_mm": 0.1,
+          "trials": 256,
+          "fit_median_mm": 0.1148705703738413,
+          "full_cloud_median_mm": 1.5601674779384314,
+          "full_cloud_p90_mm": 2.4685766816836447,
+          "target_layouts_rejected_by_existing_frontend_ratio": 0
+        },
+        {
+          "synthetic_target_coordinate_sigma_mm": 0.2,
+          "trials": 256,
+          "fit_median_mm": 0.23121907170737216,
+          "full_cloud_median_mm": 3.08877549472959,
+          "full_cloud_p90_mm": 4.962925239014344,
+          "target_layouts_rejected_by_existing_frontend_ratio": 0
+        },
+        {
+          "synthetic_target_coordinate_sigma_mm": 0.5,
+          "trials": 256,
+          "fit_median_mm": 0.5797571086672044,
+          "full_cloud_median_mm": 7.769874354011264,
+          "full_cloud_p90_mm": 12.573326406327643,
+          "target_layouts_rejected_by_existing_frontend_ratio": 0
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "noiseless_identity_checked_on_all_source_points": true,
+    "trial_count": 1536,
+    "actual_report_controller_simulated_dom": true,
+    "three_sigma_views_checked": true,
+    "new_browser_verified": false
+  }
+}
