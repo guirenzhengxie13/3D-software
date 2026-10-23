@@ -31,6 +31,7 @@ from .spatial_lod import budgeted_spatial_preview
 from .path_mapping import PathMapper
 from .web_fragments import FragmentEditorService, save as write_json_record
 from .project_history import ProjectHistory
+from .landmark_drafts import LandmarkDrafts
 
 
 def read(path):
@@ -102,6 +103,7 @@ class Studio:
         self.refresh()
         self.fragments=FragmentEditorService(self)
         self.history=ProjectHistory(self)
+        self.landmark_drafts=LandmarkDrafts(self)
 
     def read(self, path):
         return self.paths.record(read(self.paths.resolve(path)))
@@ -277,7 +279,14 @@ class Studio:
         text=payload.decode('utf-8');data=self.workbench_data(text)
         if data is None:return payload
         for cloud in data['clouds']:cloud['path']=str(self.paths.resolve(cloud['path']))
+        with self.lock:identifier=next((key for key,entry in self.pages.items() if entry['path']==path),None)
+        assets=self.root/'web/landmark-workbench'
+        if identifier and all((assets/name).is_file() for name in ['index.html','registration_math.js','point_raster.js','app.js']):
+            data['serverContext']=dict(workbench_id=identifier,page_sha256=hashlib.sha256(payload).hexdigest())
+            text=(assets/'index.html').read_text(encoding='utf-8').replace('__MATH__',(assets/'registration_math.js').read_text(encoding='utf-8'),1).replace('__RASTER__',(assets/'point_raster.js').read_text(encoding='utf-8'),1).replace('__APP__',(assets/'app.js').read_text(encoding='utf-8'),1)
+            text=text.replace('__DATA__','<insert-alignment-data>',1)
         encoded=json.dumps(data,ensure_ascii=False,separators=(',',':'),allow_nan=False).replace('&','\\u0026').replace('<','\\u003c').replace('>','\\u003e')
+        if '<insert-alignment-data>' in text:return text.replace('<insert-alignment-data>',encoded,1).encode('utf-8')
         return re.sub(r'(<script id="alignment-data" type="application/json">).*?(</script>)',
                       lambda match:match[1]+encoded+match[2],text,count=1,flags=re.S).encode('utf-8')
 
@@ -490,6 +499,7 @@ def make_handler(studio):
                 elif parsed.path=='/api/region':self.send(studio.region(get('id'),int(get('vertex')),float(get('radius_mm',5)),get('sha256')))
                 elif parsed.path=='/api/depth.png':self.send(studio.depth_image(get('scan'),int(get('ordinal',0))),'image/png')
                 elif parsed.path=='/api/history':self.send(studio.history.context(get('scan')))
+                elif parsed.path=='/api/landmark-drafts':self.send(studio.landmark_drafts.context(get('workbench'),get('draft_id',None),get('page_sha256',None)))
                 elif parsed.path=='/api/fragments/context':self.send(studio.fragments.context(get('scan')))
                 elif parsed.path=='/api/jobs':self.send([studio.job(key) for key in studio.jobs])
                 elif parsed.path.startswith('/api/jobs/'):self.send(studio.job(parsed.path.rsplit('/',1)[1]))
@@ -515,6 +525,7 @@ def make_handler(studio):
                 request=json.loads(self.rfile.read(length))
                 if self.path=='/api/jobs':self.send(studio.start_job(request),status=202)
                 elif self.path=='/api/history':self.send(studio.history.change(request))
+                elif self.path=='/api/landmark-drafts':self.send(studio.landmark_drafts.save(request),status=201)
                 elif self.path=='/api/fragments/reviews':self.send(studio.fragments.preview(request),status=201)
                 elif self.path.startswith('/api/jobs/') and self.path.endswith('/cancel'):
                     identifier=self.path.split('/')[3];job=studio.job(identifier)

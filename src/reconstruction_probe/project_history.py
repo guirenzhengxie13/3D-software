@@ -24,8 +24,7 @@ def now():return datetime.now(timezone.utc).isoformat()
 def project_file_lock(path):
     """Nonblocking OS lock, released on process exit without a stale sentinel."""
     path.parent.mkdir(parents=True,exist_ok=True)
-    with path.open('a+b') as handle:
-        if path.stat().st_size==0:handle.write(b'0');handle.flush()
+    with path.open('a+b',buffering=0) as handle:
         handle.seek(0)
         try:
             if os.name=='nt':
@@ -35,7 +34,11 @@ def project_file_lock(path):
                 import fcntl
                 fcntl.flock(handle.fileno(),fcntl.LOCK_EX|fcntl.LOCK_NB)
         except OSError as error:raise ValueError('另一个服务正在更新本工程版本，请稍后刷新') from error
-        try:yield
+        try:
+            # Initialize only after locking: concurrent creators must not write
+            # the lock byte while another process owns that byte on Windows.
+            if path.stat().st_size==0:handle.write(b'0')
+            yield
         finally:
             handle.seek(0)
             if os.name=='nt':msvcrt.locking(handle.fileno(),msvcrt.LK_UNLCK,1)

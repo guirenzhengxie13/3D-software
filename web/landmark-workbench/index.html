@@ -28,10 +28,18 @@ aside{height:calc(100vh - 76px);overflow:auto}.views{max-height:calc(100vh - 76p
 <div id="status" role="status" aria-live="polite">正在初始化点云。如果这里一直不变，请检查浏览器是否允许 JavaScript。</div>
 <noscript>本页面需要启用 JavaScript 才能显示点云。</noscript>
 <p id="metrics" class="small"></p>
-<h2>保存这次操作</h2>
+<h2>未完成的选点草稿</h2>
+<p class="small muted">可保存少于三对、尚未计算的选点和等待配对的固定点。恢复后再确认、计算；不会自动提交任务。</p>
+<label class="small">草稿名称 <input id="draftLabel" maxlength="100" placeholder="例如：杯柄连接待确认" style="width:100%;padding:7px"></label>
+<button id="saveDraft" class="full" disabled>保存草稿到本项目</button>
+<div class="row"><button id="exportDraft">导出草稿 JSON</button><button id="refreshDrafts">刷新列表</button></div>
+<select id="draftSelect" class="full" aria-label="选择已保存的选点草稿"></select>
+<button id="restoreDraft" class="full" disabled>恢复所选草稿</button>
+<p id="draftStatus" class="small muted" role="status" aria-live="polite"></p>
+<h2>保存这次对齐</h2>
 <button id="export" class="full">导出选点与变换 JSON</button>
 <button id="submitStudio" class="primary full" hidden>核对并另存对齐模型</button>
-<button id="import" class="full">载入之前的选点 JSON</button><input id="file" type="file" accept="application/json,.json">
+<button id="import" class="full">载入选点或草稿 JSON</button><input id="file" type="file" accept="application/json,.json">
 <p class="small muted">导出只保存模型引用、原点编号、对应关系和变换。后端会核对原文件，再生成新结果。</p>
 <h2>显示</h2><select id="colorMode"><option value="separate">叠加按片段着色</option><option value="rgb">叠加显示原顶点色</option></select>
 <label class="small">显示增亮 <input id="gain" type="range" min="1" max="4" step=".2" value="1.8" style="width:125px">（不改原颜色）</label>

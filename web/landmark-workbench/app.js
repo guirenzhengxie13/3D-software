@@ -6,7 +6,7 @@
     return;
   }
   const DATA=JSON.parse(document.getElementById('alignment-data').textContent),M=RegistrationMath,$=id=>document.getElementById(id);
-  const state={pairs:[],pending:null,matrix:M.identity(),kind:'existing_candidate',fit:null,label:'',dirty:true};
+  const state={pairs:[],pending:null,matrix:M.identity(),kind:'existing_candidate',fit:null,label:'',dirty:true,revision:0};
   const clone=value=>JSON.parse(JSON.stringify(value));
   function decode(text,type){const raw=atob(text),bytes=Uint8Array.from(raw,x=>x.charCodeAt(0)),view=new DataView(bytes.buffer);if(type==='u8')return bytes;return type==='u32'?Uint32Array.from({length:bytes.length/4},(_,i)=>view.getUint32(i*4,true)):Float32Array.from({length:bytes.length/4},(_,i)=>view.getFloat32(i*4,true));}
   const models=DATA.clouds.map(row=>({...row,points:decode(row.xyz,'f32'),colors:decode(row.rgb,'u8'),originalIds:decode(row.ids,'u32')}));
@@ -92,22 +92,25 @@
     if(!changed)return;state.dirty=false;
     names.forEach((name,index)=>{const canvas=$(name),w=Math.max(1,canvas.clientWidth),h=Math.max(1,canvas.clientHeight);cameras[index].mvp=cameraMatrix(cameras[index],w,h);if(renderers[index])renderers[index](index,cameras[index].mvp,ratio);markers(index,w,h);});
   }
+  function rmsRadius(points){if(!points.length)return 0;const center=[0,1,2].map(j=>points.reduce((sum,p)=>sum+p[j]/points.length,0));return Math.sqrt(points.reduce((sum,p)=>sum+p.reduce((r,v,j)=>r+(v-center[j])**2,0)/points.length,0));}
+  const previewRadii=models.map(model=>rmsRadius(Array.from({length:model.displayPoints},(_,i)=>point(model,i))));
   function updatePairs(){
     $('pairs').replaceChildren();state.pairs.forEach((pair,index)=>{const li=document.createElement('li');li.textContent=`固定 #${pair.target.id} ↔ 移动 #${pair.source.id}`+(state.fit?` · ${state.fit.residuals[index].toFixed(3)} mm`:'');const button=document.createElement('button');button.textContent='移除';button.onclick=()=>{state.pairs.splice(index,1);invalidate();};li.appendChild(button);$('pairs').appendChild(li);});
     $('solve').disabled=state.pairs.length<3;$('export').disabled=$('submitStudio').disabled=state.kind==='manual_stale';
     $('metrics').textContent=state.fit?`选点 RMSE ${state.fit.rmse.toFixed(4)} mm\n最大选点残差 ${state.fit.maxResidual.toFixed(4)} mm\n对应点尺度比 ${state.fit.spanRatio.toFixed(4)}（未缩放）`:`${state.pairs.length} 对对应点${state.pending?' · 等待移动片段选点':''}`;
+    if(state.pairs.length>=2)$('metrics').textContent+='\n选点覆盖 RMS 半径：'+[['固定','target',0],['移动','source',1]].map(([label,key,i])=>{const radius=rmsRadius(state.pairs.map(p=>p[key].xyz));return label+' '+radius.toFixed(2)+' mm（预览云半径的 '+(previewRadii[i]>0?(100*radius/previewRadii[i]).toFixed(1):'—')+'%）';}).join('；')+'\n覆盖半径描述选点分布；比例受预览范围影响，不是精度或接受门槛。';
     $('previewLabel').textContent=state.kind==='manual_stale'?'选点已变更，待重新计算':state.label;
     state.dirty=true;
   }
-  function invalidate(){if(state.kind==='manual_landmarks')state.kind='manual_stale';state.fit=null;updatePairs();}
-  function chooseCandidate(){const row=DATA.candidates[Number($('candidate').value)];state.matrix=clone(row.transform);state.kind='existing_candidate';state.label=row.label;state.fit=null;fitCamera(2);updatePairs();message('已预览所选候选。对应点尚未用于修改它，可开始选点。');}
+  function invalidate(){state.revision++;if(state.kind==='manual_landmarks')state.kind='manual_stale';state.fit=null;updatePairs();}
+  function chooseCandidate(){state.revision++;const row=DATA.candidates[Number($('candidate').value)];state.matrix=clone(row.transform);state.kind='existing_candidate';state.label=row.label;state.fit=null;fitCamera(2);updatePairs();message('已预览所选候选。对应点尚未用于修改它，可开始选点。');}
   DATA.candidates.forEach((row,index)=>{const option=document.createElement('option');option.value=index;option.textContent=row.label;$('candidate').appendChild(option);});
   $('candidate').value=String(Math.max(0,DATA.candidates.findIndex(row=>row.label==='direct_best_training')));
   $('candidate').onchange=$('restore').onclick=chooseCandidate;
   $('resetView').onclick=()=>{for(let i=0;i<3;i++)fitCamera(i);};
   $('undoPair').onclick=()=>{if(state.pending)state.pending=null;else state.pairs.pop();invalidate();};
   $('clearPairs').onclick=()=>{state.pending=null;state.pairs=[];invalidate();};
-  $('solve').onclick=()=>{try{const fitted=M.solveRigid(state.pairs.map(p=>p.source.xyz),state.pairs.map(p=>p.target.xyz));state.matrix=fitted.matrix;state.fit=fitted;state.kind='manual_landmarks';state.label='对应点刚体对齐';fitCamera(2);updatePairs();message('对齐已预览。检查局部重影和各对残差；选点残差并不代表整个表面精度。');}catch(error){message('暂不能计算：'+error.message);}};
+  $('solve').onclick=()=>{try{const fitted=M.solveRigid(state.pairs.map(p=>p.source.xyz),state.pairs.map(p=>p.target.xyz));state.revision++;state.matrix=fitted.matrix;state.fit=fitted;state.kind='manual_landmarks';state.label='对应点刚体对齐';fitCamera(2);updatePairs();message('对齐已预览。检查局部重影和各对残差；选点残差并不代表整个表面精度。');}catch(error){message('暂不能计算：'+error.message);}};
   $('colorMode').onchange=()=>{state.dirty=true;};
   $('gain').oninput=()=>{displayGain=Math.max(1,Math.min(4,Number($('gain').value)));state.dirty=true;};
   names.forEach((name,index)=>{
@@ -121,7 +124,7 @@
         const selected={id:Number(models[index].originalIds[hit.index]),xyz:point(models[index],hit.index)};
         if(index===0){state.pending=selected;message('已选固定点。请在中间移动片段中选择同一位置。');}
         else if(!state.pending){message('先在左侧固定片段选点，再选移动片段。');return;}
-        else{if(state.pairs.some(pair=>pair.source.id===selected.id||pair.target.id===state.pending.id)){message('该点已用于已有对应对，请选择另一个位置。');return;}state.pairs.push({target:state.pending,source:selected});state.pending=null;message(`已记录 ${state.pairs.length} 对。至少三对且不要集中在一条线上。`);}
+        else{if(state.pairs.some(pair=>pair.source.id===selected.id||pair.target.id===state.pending.id)){message('该点已用于已有对应对，请选择另一个位置。');return;}if(state.pairs.length>=64){message('当前最多64对对应点，请先保存或移除部分选点。');return;}state.pairs.push({target:state.pending,source:selected});state.pending=null;message(`已记录 ${state.pairs.length} 对。至少三对且不要集中在一条线上。`);}
         invalidate();return;
       }
       drag={id:event.pointerId,x:event.clientX,y:event.clientY,pan:event.shiftKey||event.button!==0};canvas.setPointerCapture(event.pointerId);
@@ -130,6 +133,35 @@
     for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,()=>{drag=null;});
     canvas.addEventListener('wheel',event=>{event.preventDefault();const camera=cameras[index];camera.distance=Math.max(camera.radius*.08,Math.min(camera.radius*100,camera.distance*Math.exp(Math.max(-100,Math.min(100,event.deltaY))*.003)));state.dirty=true;},{passive:false});
   });
+  // Drafts deliberately contain no fitted matrix. A restored manual preview must be recomputed.
+  let draftContext=null,draftBusy=false,draftRefresh=0;
+  const server=DATA.serverContext&&window.location?.protocol==='http:'?DATA.serverContext:null;
+  function draftRecord(){return {format:'reconstruction-landmark-draft',format_version:1,unit:'mm',
+    source:{sha256:models[1].sourceSha256,fragment_id:models[1].fragmentId??1},target:{sha256:models[0].sourceSha256,fragment_id:models[0].fragmentId??0},
+    candidate_label:DATA.candidates[Number($('candidate').value)].label,candidate_sha256:DATA.candidateReference.sha256,requires_recompute:state.kind!=='existing_candidate',point_pairs:clone(state.pairs),pending_target:clone(state.pending)};}
+  function downloadJSON(record,name){const blob=new Blob([JSON.stringify(record,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  function applyDraft(draft){
+    if(draft.format!=='reconstruction-landmark-draft'||draft.format_version!==1||draft.unit!=='mm'||typeof draft.requires_recompute!=='boolean'||!Array.isArray(draft.point_pairs)||draft.point_pairs.length>64)throw Error('不支持的草稿格式');
+    for(const [key,index] of [['target',0],['source',1]])if(draft[key]?.sha256!==models[index].sourceSha256||draft[key]?.fragment_id!==(models[index].fragmentId??index))throw Error('草稿模型、方向或片段身份不一致');
+    if(draft.candidate_sha256!==DATA.candidateReference.sha256)throw Error('草稿候选来源已换版');
+    const candidate=DATA.candidates.findIndex(row=>row.label===draft.candidate_label);if(candidate<0)throw Error('草稿候选不在当前工作区');
+    const maps=models.map(model=>new Map(Array.from(model.originalIds,(id,index)=>[id,index]))),used=[new Set(),new Set()];
+    function selected(value,index,allowDuplicate=false){const id=value?.id,row=maps[index].get(id);if(!Number.isInteger(id)||row===undefined||(!allowDuplicate&&used[index].has(id)))throw Error('选点重复或当前预览不含所需原顶点，请保留原编号重建预览');const xyz=point(models[index],row);if(!Array.isArray(value.xyz)||value.xyz.length!==3||value.xyz.some((v,i)=>v!==xyz[i]))throw Error('草稿坐标与当前原点编号不一致');used[index].add(id);return {id,xyz};}
+    const pairs=draft.point_pairs.map(pair=>({target:selected(pair.target,0),source:selected(pair.source,1)})),pending=draft.pending_target===null?null:selected(draft.pending_target,0,true);
+    // All validation completes before modifying the current editor.
+    $('candidate').value=String(candidate);state.pairs=pairs;state.pending=pending;state.matrix=clone(DATA.candidates[candidate].transform);state.fit=null;state.kind=draft.requires_recompute?'manual_stale':'existing_candidate';state.label=DATA.candidates[candidate].label;state.revision++;
+    fitCamera(2);updatePairs();message(draft.requires_recompute?'草稿选点已恢复。当前显示保存候选位置，请重新计算刚体对齐后再导出或提交。':'草稿选点与候选位置已恢复；尚未提交任务。');
+  }
+  async function draftAPI(path,body){const response=await fetch(path,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const result=await response.json();if(!response.ok)throw Error(result.error||'草稿请求失败');return result;}
+  function draftControls(){const available=server&&draftContext?.page_sha256===server.page_sha256;$('saveDraft').disabled=draftBusy||!available;$('refreshDrafts').disabled=draftBusy||!server;$('restoreDraft').disabled=draftBusy||!available||!draftContext?.drafts.some(d=>d.id===$('draftSelect').value&&d.available);}
+  function showDrafts(context){draftContext=context;const previous=$('draftSelect').value;$('draftSelect').replaceChildren();for(const row of context.drafts){const option=document.createElement('option');option.value=row.id;option.disabled=!row.available;option.textContent=`${row.label} · ${row.pairs}对${row.pending?'＋待配对':''} · ${row.created_at.slice(0,19).replace('T',' ')} UTC`+(row.available?'':' · '+row.reason);$('draftSelect').appendChild(option);}const chosen=context.drafts.find(d=>d.id===previous&&d.available)||context.drafts.find(d=>d.available);$('draftSelect').value=chosen?.id||'';draftControls();}
+  async function refreshDrafts(){if(!server)return;const serial=++draftRefresh;try{const context=await draftAPI('/api/landmark-drafts?workbench='+encodeURIComponent(server.workbench_id));if(serial!==draftRefresh)return;showDrafts(context);$('draftStatus').textContent=context.page_sha256===server.page_sha256?`已保存 ${context.drafts.length} 份草稿。保存采用独立快照；关闭页面前请点击保存。`:'工作区页面已换版，请重新打开后核对草稿。';}catch(error){if(serial===draftRefresh){draftContext=null;draftControls();$('draftStatus').textContent='草稿列表读取失败：'+error.message;}}}
+  $('draftSelect').onchange=draftControls;
+  $('refreshDrafts').onclick=refreshDrafts;
+  $('exportDraft').onclick=()=>{downloadJSON(draftRecord(),'landmark-draft.json');$('draftStatus').textContent='已导出未完成草稿；以后用“载入选点或草稿 JSON”恢复。';};
+  $('saveDraft').onclick=async()=>{if(draftBusy||!server||!draftContext)return;const snapshot=draftRecord(),revision=state.revision,label=$('draftLabel').value.trim();if(!label){$('draftStatus').textContent='请先填写草稿名称。';return;}draftBusy=true;draftControls();++draftRefresh;try{const result=await draftAPI('/api/landmark-drafts',{workbench_id:server.workbench_id,page_sha256:server.page_sha256,state_sha256:draftContext.state_sha256,label,draft:snapshot});showDrafts(result);$('draftSelect').value=result.saved_id;$('draftStatus').textContent=revision===state.revision?'草稿已保存。原模型未修改；没有自动计算或提交。':'请求发出时的草稿已保存，之后的新选点尚未保存。';}catch(error){$('draftStatus').textContent='保存失败：'+error.message;}finally{draftBusy=false;draftControls();}};
+  $('restoreDraft').onclick=async()=>{if(draftBusy||!server||!draftContext||!$('draftSelect').value)return;const revision=state.revision,id=$('draftSelect').value;draftBusy=true;draftControls();++draftRefresh;try{const result=await draftAPI('/api/landmark-drafts?workbench='+encodeURIComponent(server.workbench_id)+'&draft_id='+encodeURIComponent(id)+'&page_sha256='+server.page_sha256);showDrafts(result);if(revision!==state.revision){$('draftStatus').textContent='读取期间选点已变化，保留当前编辑；请再次点击恢复。';return;}applyDraft(result.draft);$('draftStatus').textContent='已恢复所选草稿，原快照仍保留。';}catch(error){$('draftStatus').textContent='恢复失败：'+error.message;}finally{draftBusy=false;draftControls();}};
+  if(server)refreshDrafts();else{$('draftStatus').textContent='当前为独立页面，可导出草稿 JSON；从本地 Web 工作台打开可保存到项目。';draftControls();}
   function sessionRecord(){return {format_version:1,kind:state.kind,unit:'mm',source:{path:models[1].path,sha256:models[1].sourceSha256,group_id_high:models[1].idHighWord??null,fragment_id:models[1].fragmentId??1},target:{path:models[0].path,sha256:models[0].sourceSha256,group_id_high:models[0].idHighWord??null,fragment_id:models[0].fragmentId??0},prepared_path:DATA.preparedPath,candidate_reference:DATA.candidateReference,candidate_label:state.label,transform_source_to_target:clone(state.matrix),point_pairs:state.kind==='manual_landmarks'?clone(state.pairs):[],fit:state.fit?clone(state.fit):null,provenance:'Interactive preview export; no source models or poses modified',created_at:new Date().toISOString()};}
   $('export').onclick=()=>{
     if(state.kind==='manual_stale'){message('对应点已变化，请重新计算后再导出。');return;}
@@ -143,8 +175,10 @@
   $('import').onclick=()=>$('file').click();
   $('file').onchange=async()=>{
     try {
-      const file=$('file').files[0];if(!file)return;
+      const file=$('file').files[0];if(!file)return;const revision=state.revision;if(file.size>1000000)throw Error('JSON超过1MB');
       const session=JSON.parse(await file.text());
+      if(revision!==state.revision)throw Error('读取期间选点已变化，已保留当前编辑，请重新载入');
+      if(session.format==='reconstruction-landmark-draft'){applyDraft(session);return;}
       if(session.format_version!==1||session.unit!=='mm'||session.source.sha256!==models[1].sourceSha256||session.target.sha256!==models[0].sourceSha256)throw new Error('模型哈希、单位或版本不匹配');
       if(!['manual_landmarks','existing_candidate'].includes(session.kind))throw new Error('不支持的选点文件类型');
       if(!Array.isArray(session.point_pairs)||session.point_pairs.length>64)throw new Error('对应点数量不符合要求');
@@ -168,6 +202,7 @@
         if(!matched)throw new Error('当前页面中找不到该候选');
         matrix=clone(matched.transform);kind='existing_candidate';label=matched.label;
       }
+      state.revision++;if(kind==='existing_candidate')$('candidate').value=String(DATA.candidates.findIndex(row=>row.label===label));
       state.pairs=pairs;state.pending=null;state.fit=fitted;state.matrix=matrix;state.kind=kind;state.label=label;
       fitCamera(2);updatePairs();message('已载入并按当前模型重新核对选点。');
     } catch(error){message('载入失败：'+error.message);}

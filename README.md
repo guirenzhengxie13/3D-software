@@ -27,7 +27,7 @@ py -3.12 -m venv .venv
 
 - **模型**：空间预览、图层叠加、本地PLY浏览、原点编号和局部完整点。
 - **保存帧**：反投影保存深度，结合保存位姿查看逐帧点云与深度图；不假定真实采集时间。
-- **对应点**：选择固定/移动模型，核验刚体变换；显式绑定原帧，审阅输入后运行原位姿与校正位姿两组重融合。
+- **对应点**：选择固定/移动模型，保存和恢复未完成选点草稿，核验刚体变换；显式绑定原帧，审阅输入后运行原位姿与校正位姿两组重融合。
 - **实验与任务**：保留融合候选、失败尝试、来源证据、处理参数、日志与状态。
 
 当前没有连接语言模型Agent服务。同一工程的显式帧归属、对应点核验与原深度重融合已接通网页、CLI和固定工作流。模型组合可保存为固定版本，切换支持撤销重做；跨工程通用绑定与完整参数/帧编辑历史仍在开发。
@@ -59,6 +59,7 @@ HANDOFF.md                 当前进度、问题、验收与续接入口
 - [解包到融合的处理链路](docs/offline-reconstruction-pipeline.md)
 - [网页原帧绑定与两组重融合](docs/web-fragment-workflow.md)
 - [工程结果版本与撤销重做](docs/project-result-history.md)
+- [未完成对应点草稿与恢复](docs/landmark-drafts.md)
 - [局部几何约束与错配诊断](docs/local-constraint-diagnostics.md)
 - [对应点结果到原帧重融合](docs/fragment-fusion-bridge.md)
 - [备份范围与恢复方法](docs/backup-and-restore.md)
@@ -72,6 +73,7 @@ HANDOFF.md                 当前进度、问题、验收与续接入口
 & 'C:\Program Files\nodejs\node.exe' tests\check_web_studio.cjs
 & 'C:\Program Files\nodejs\node.exe' tests\check_fragment_editor.cjs
 & 'C:\Program Files\nodejs\node.exe' tests\check_project_history.cjs
+& 'C:\Program Files\nodejs\node.exe' tests\check_landmark_drafts.cjs
 ```
 
 Node路径按实际安装位置调整。测试使用合成控制和可用的本地数据；没有独立几何真值，内部残差和更多表面点不等于物理精度更高。

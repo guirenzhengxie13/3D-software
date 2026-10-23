@@ -1,0 +1,94 @@
+{
+  "checked_at_utc": "2026-10-23T17:45:26.358185+00:00",
+  "workbench_id": "8e38ece6da4224bd",
+  "workbench_url": "/reports/range2-study-20261018/experiments/fragment-bridge-20261021/verified/workbench.html",
+  "scan_id": "scan_20261018131222",
+  "new_draft_ids": [
+    "47c4b2a26f714d21",
+    "3a64ad0ba5204e43"
+  ],
+  "previous_drafts": 0,
+  "after_drafts": 2,
+  "draft_state_sha256": "672ae36ee1d2e5d9c09e47316b5ccaf4cba0fe9b49ac7cf96933f57b8e265e75",
+  "source_inputs_unchanged": true,
+  "input_sha256": {
+    "G:\\project\\revopoint software\\reports\\range2-study-20261018\\experiments\\fragment-bridge-20261021\\verified\\workbench.html": "7204e0e34473c2f793d3cb56c765f62c1d32aaae8e8f4fba779035cb85dffff5",
+    "G:\\project\\revopoint software\\reports\\range2-study-20261018\\experiments\\cup-segment-pose-graph\\segment-0-training-mm.ply": "0d1b65bda5319a6215a925b6814c1ac4ef489a8348c8c8d58ee2fcf6c152353f",
+    "G:\\project\\revopoint software\\reports\\range2-study-20261018\\experiments\\cup-segment-pose-graph\\segment-1-training-mm.ply": "759cea4fe87026a20ca40dd3bfc8bb5a1ba619b55db45cdcb240c066d57e3b62",
+    "G:\\project\\revopoint software\\reports\\range2-study-20261018\\experiments\\fragment-bridge-20261021\\verified\\candidates\\summary.json": "971fc77356320508aded2fb4b7b41c985d92aa61ff271f12a8aa3f58e1e82d27"
+  },
+  "code_sha256": {
+    "src/reconstruction_probe/landmark_drafts.py": "bf7d58b1762a29a536cfc98fe3c0b5eb6a0523f566916464c3a686dc2288623c",
+    "src/reconstruction_probe/project_history.py": "98ee49a7b2b0371ad1fad1fee1c207f5b4a8ff468af7c26a1f8c42557bc1a055",
+    "src/reconstruction_probe/web_studio.py": "1c7e91d06a675ecdadea4b736723e6ba3c87d53573bf15bc0facf1e7d2b3423d",
+    "web/landmark-workbench/app.js": "688cbd3938eb42a4ab9267cbedc6bce8e11f7bf524802df7ed5b599a389710d7",
+    "web/landmark-workbench/index.html": "090f2dffca46b5be7daa89e8c0f18ac3f086efed2c55aaf1825bb5edfcae43e1",
+    "scripts/check_landmark_drafts_live.py": "2a5514bdf60fb1069af8358e7c18a3ce24f6b90f52012db0e6e8f022470c9b9a",
+    "tests/check_landmark_drafts_http.cjs": "30bcea24be4af05dffe58103f72c358559fe97b7010dd88fc5e431e04b5c2cd2"
+  },
+  "jobs_unchanged": true,
+  "model_history_unchanged": true,
+  "model_history_sha256": "d491a08af198af98be092fd3df31bb7b3842f7e577073955a101e2984cd20350",
+  "served_page_sha256": "18228337303c56bdc6933b8a3521e195a404aa5a3a14b0521eac0d4210b16be0",
+  "controller": {
+    "served_controller_restored_saved_draft": true,
+    "original_ids_and_pending_preserved": true,
+    "requires_recompute": true,
+    "point_pairs": 1,
+    "pending_target": 1,
+    "network_requests": 2,
+    "no_job_submission": true,
+    "gpu_verified": false
+  },
+  "cpu_rasters": [
+    {
+      "display_points": 13206,
+      "visible_pixels": 69415,
+      "width": 800,
+      "height": 600
+    },
+    {
+      "display_points": 26269,
+      "visible_pixels": 43703,
+      "width": 800,
+      "height": 600
+    }
+  ],
+  "limits": [
+    "Automated arbitrary original IDs are persistence fixtures, not physical corresponding points.",
+    "No solver, alignment or fusion invoked; no new geometry improvement claimed.",
+    "Actual HTTP plus simulated DOM and shared CPU pixels; no new Chrome/GPU observation."
+  ],
+  "validation": {
+    "python_tests": 200,
+    "node_checks": "Eight standalone Node checks plus actual served HTTP controller",
+    "actual_chrome_gpu_verified": false
+  },
+  "original_source_audit": {
+    "projects": 29,
+    "required_source_files": 388,
+    "source_bytes_read": 3031514347,
+    "all_required_source_files_match": true
+  },
+  "final_restart_readback": {
+    "checked_at_utc": "2026-10-23T17:51:15.469919+00:00",
+    "draft_state_sha256": "672ae36ee1d2e5d9c09e47316b5ccaf4cba0fe9b49ac7cf96933f57b8e265e75",
+    "draft_count": 2,
+    "model_history_sha256": "d491a08af198af98be092fd3df31bb7b3842f7e577073955a101e2984cd20350",
+    "model_version_count": 4,
+    "jobs": 6,
+    "active_jobs": 0,
+    "original_pages_and_models_unchanged": true,
+    "served_controller": {
+      "served_controller_restored_saved_draft": true,
+      "original_ids_and_pending_preserved": true,
+      "requires_recompute": true,
+      "point_pairs": 1,
+      "pending_target": 1,
+      "network_requests": 2,
+      "no_job_submission": true,
+      "gpu_verified": false
+    },
+    "served_page_sha256": "18228337303c56bdc6933b8a3521e195a404aa5a3a14b0521eac0d4210b16be0"
+  }
+}
