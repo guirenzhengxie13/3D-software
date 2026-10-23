@@ -30,6 +30,7 @@ from .ply_spatial_index import PlySpatialIndex
 from .spatial_lod import budgeted_spatial_preview
 from .path_mapping import PathMapper
 from .web_fragments import FragmentEditorService, save as write_json_record
+from .project_history import ProjectHistory
 
 
 def read(path):
@@ -98,6 +99,7 @@ class Studio:
                 self.restore_issues.append(dict(kind='job',path=str(record),reason=str(error)))
         self.refresh()
         self.fragments=FragmentEditorService(self)
+        self.history=ProjectHistory(self)
 
     def read(self, path):
         return self.paths.record(read(self.paths.resolve(path)))
@@ -277,12 +279,15 @@ class Studio:
         return re.sub(r'(<script id="alignment-data" type="application/json">).*?(</script>)',
                       lambda match:match[1]+encoded+match[2],text,count=1,flags=re.S).encode('utf-8')
 
-    def cloud(self, identifier, budget=40000):
+    def cloud(self, identifier, budget=40000, expected_sha256=None):
         if identifier not in self.models:raise ValueError('模型不在当前目录清单中')
         if type(budget) is not int or not 100<=budget<=60000:raise ValueError('预览预算需要在100至60000点之间')
-        meta=self.models[identifier];source=Path(meta['path']);stat=source.stat(); key=(str(source),stat.st_size,stat.st_mtime_ns,budget)
+        meta=self.models[identifier];source=Path(meta['path'])
+        if expected_sha256 is not None:
+            if not isinstance(expected_sha256,str) or not re.fullmatch('[0-9a-f]{64}',expected_sha256) or file_sha256(source)!=expected_sha256:raise ValueError('模型与工程版本SHA不一致，请刷新并核对文件')
+        stat=source.stat(); key=(str(source),stat.st_size,stat.st_mtime_ns,budget)
         with self.lock:
-            if key in self.cache:self.cache.move_to_end(key);return self.cache[key]
+            if key in self.cache and (expected_sha256 is None or self.cache[key].get('sourceSha256')==expected_sha256):self.cache.move_to_end(key);return self.cache[key]
         with self.processing:
             cached=None
             for manifest in (self.root/'reports/pointcloud-scale-20261019/lod').glob('*/summary.json'):
@@ -298,6 +303,7 @@ class Studio:
                 selection='体素代表点 · 原编号保留'
             result=dict(**pack(xyz,rgb,ids),**{k:v for k,v in meta.items() if k!='points'},sourceSha256=file_sha256(source),selection=selection,
                         originalPoints=meta['points'],bounds=[xyz.min(0).tolist(),xyz.max(0).tolist()])
+        if expected_sha256 is not None and result['sourceSha256']!=expected_sha256:raise ValueError('模型在读取期间变化，已阻止显示此版本')
         with self.lock:
             self.cache[key]=result
             while len(self.cache)>8:self.cache.popitem(last=False)
@@ -323,10 +329,11 @@ class Studio:
             capture_timestamp=None,label=f"保存帧 {frame['id']}",
             depth_url=f'/api/depth.png?scan={scan_id}&ordinal={ordinal}')
 
-    def region(self, identifier, vertex, radius_mm):
+    def region(self, identifier, vertex, radius_mm, expected_sha256=None):
         if identifier not in self.models:raise ValueError('未知模型')
         if type(vertex) is not int or not np.isfinite(radius_mm) or not 0<radius_mm<=50:raise ValueError('需要有效原点编号和0至50mm局部半径')
         meta=self.models[identifier];source=Path(meta['path']);digest=file_sha256(source)
+        if expected_sha256 is not None and digest!=expected_sha256:raise ValueError('局部模型与工程版本SHA不一致')
         candidates=[*(self.root/'reports/pointcloud-scale-20261019/spatial-index').glob('*/index/summary.json'),
                     *(self.root/'reports/pointcloud-scale-20261019/workflow-spatial-run/nodes').glob('*/summary.json'),
                     *self.output.glob('*/result/nodes/index/summary.json')]
@@ -344,6 +351,7 @@ class Studio:
             ids=region['original_vertex_ids']
             if len(ids)>60000:raise ValueError('局部完整点超过60000显示预算，请缩小半径')
             xyz=region['xyz_mm'];rgb=record_rgb(index.records,ids)
+        if expected_sha256 is not None and file_sha256(source)!=expected_sha256:raise ValueError('局部模型在读取期间变化')
         return dict(**pack(xyz,rgb,ids),**{k:v for k,v in meta.items() if k!='points'},originalPoints=meta['points'],sourceSha256=digest,
                     selection=f'局部完整原顶点 · 原点 #{vertex} 周围 {radius_mm:g} mm',exact_region=True,center_mm=center.tolist())
 
@@ -475,10 +483,11 @@ def make_handler(studio):
             parsed=urlsplit(self.path);query=parse_qs(parsed.query);get=lambda key,default=None:query.get(key,[default])[0]
             try:
                 if parsed.path=='/api/catalog':self.send(studio.refresh() if get('refresh')=='1' else studio.catalog)
-                elif parsed.path=='/api/cloud':self.send(studio.cloud(get('id'),int(get('budget',40000))))
+                elif parsed.path=='/api/cloud':self.send(studio.cloud(get('id'),int(get('budget',40000)),get('sha256')))
                 elif parsed.path=='/api/frame':self.send(studio.frame(get('scan'),int(get('ordinal',0))))
-                elif parsed.path=='/api/region':self.send(studio.region(get('id'),int(get('vertex')),float(get('radius_mm',5))))
+                elif parsed.path=='/api/region':self.send(studio.region(get('id'),int(get('vertex')),float(get('radius_mm',5)),get('sha256')))
                 elif parsed.path=='/api/depth.png':self.send(studio.depth_image(get('scan'),int(get('ordinal',0))),'image/png')
+                elif parsed.path=='/api/history':self.send(studio.history.context(get('scan')))
                 elif parsed.path=='/api/fragments/context':self.send(studio.fragments.context(get('scan')))
                 elif parsed.path=='/api/jobs':self.send([studio.job(key) for key in studio.jobs])
                 elif parsed.path.startswith('/api/jobs/'):self.send(studio.job(parsed.path.rsplit('/',1)[1]))
@@ -503,6 +512,7 @@ def make_handler(studio):
                 if not 0<length<=1000000:raise ValueError('请求大小超过限制')
                 request=json.loads(self.rfile.read(length))
                 if self.path=='/api/jobs':self.send(studio.start_job(request),status=202)
+                elif self.path=='/api/history':self.send(studio.history.change(request))
                 elif self.path=='/api/fragments/reviews':self.send(studio.fragments.preview(request),status=201)
                 elif self.path.startswith('/api/jobs/') and self.path.endswith('/cancel'):
                     identifier=self.path.split('/')[3];job=studio.job(identifier)

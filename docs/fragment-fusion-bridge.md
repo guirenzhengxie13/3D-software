@@ -99,4 +99,4 @@ ROI始终通过原优化位姿计算，保证校正组和控制组选择同一�
 
 本地最终完整记录位于 `reports/web-studio/sync-20261021/final-bridge/`；早期验证保留在 `reports/range2-study-20261018/experiments/fragment-bridge-20261021/verified/`。实验当前入口为后者父目录的 `current-review.html`。`review.html` 复用Web Studio的查看器、选点算法和CPU兼容绘制；生成时嵌入代码SHA。双栏可以联动旋转、缩放和选取各自模型的原顶点。页面原色和伪彩不改变源数据；伪彩在各模型内归一化，仅作观察。
 
-2026-10-22网页真实接口回放也复现了相同114帧与两组表面，见[本轮验证](../research/verification/2026-10-22-web-fragments/README.md)。仍需继续：跨工程坐标契约、工程历史和撤销、独立的几何质量评测。整个336帧失败扫描尚未修好。本次实际统一查看器CPU像素检查与浏览器/GPU验证分别记录。
+2026-10-22网页真实接口回放也复现了相同114帧与两组表面，见[本轮验证](../research/verification/2026-10-22-web-fragments/README.md)。模型结果版本与切换撤销已于2026-10-23接入，见[工程版本说明](project-result-history.md)。仍需继续：跨工程坐标契约、完整帧/参数编辑历史、独立的几何质量评测。整个336帧失败扫描尚未修好。本次实际统一查看器CPU像素检查与浏览器/GPU验证分别记录。

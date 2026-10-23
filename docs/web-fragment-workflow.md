@@ -45,7 +45,7 @@ flowchart LR
 
 核验不会启动融合。它另存 `reports/web-studio/fragment-reviews/<编号>/binding.json`、`fragment-plan.json`、`review.json`。执行请求同时固定计划和核验记录的SHA；服务端重新核对记录、索引以及计划引用的深度、位姿、模型和来源文件。已提交的核验不可重复执行；重跑需生成新核验。
 
-任务写入 `reports/web-studio/runs/<任务编号>/`。queued/running状态在执行前持久化；服务重启后，未完成旧任务显示为interrupted，用户可以检查日志并重新核验运行。完成任务保留 `result/review.html` 双栏模型、`result/index.html` 工作流记录和每步日志。它们是新派生结果，目前不自动提升为工程主版本，也未实现工程历史切换和撤销。
+任务写入 `reports/web-studio/runs/<任务编号>/`。queued/running状态在执行前持久化；服务重启后，未完成旧任务显示为interrupted，用户可以检查日志并重新核验运行。完成任务保留 `result/review.html` 双栏模型、`result/index.html` 工作流记录和每步日志。它们是新派生结果，不自动提升为工程活动版本。现在可从处理任务点击“在工程中查看两组结果”，明确选择后登记命名版本；[模型版本切换与撤销重做](project-result-history.md)已接入。完整算法参数和帧编辑状态的回滚仍未实现。
 
 ## 接口和验证
 

@@ -1,0 +1,133 @@
+{
+  "status": "actual_http_result_versions_with_persistent_restart_readback",
+  "scan_id": "scan_20261018131222",
+  "existing_fusion_job": "465fdb3b59b740b2",
+  "new_fusion_run": false,
+  "created_versions": {
+    "baseline": "0eae0e2defd7443c",
+    "saved": "be4de62af4a94625",
+    "corrected": "cdeab84b4db2459c",
+    "comparison_branch": "d663cc3072124175"
+  },
+  "initial_operations": [
+    {
+      "action": "save",
+      "from_version": null,
+      "to_version": "0eae0e2defd7443c"
+    },
+    {
+      "action": "save",
+      "from_version": "0eae0e2defd7443c",
+      "to_version": "be4de62af4a94625"
+    },
+    {
+      "action": "save",
+      "from_version": "be4de62af4a94625",
+      "to_version": "cdeab84b4db2459c"
+    },
+    {
+      "action": "undo",
+      "from_version": "cdeab84b4db2459c",
+      "to_version": "be4de62af4a94625"
+    },
+    {
+      "action": "redo",
+      "from_version": "be4de62af4a94625",
+      "to_version": "cdeab84b4db2459c"
+    },
+    {
+      "action": "undo",
+      "from_version": "cdeab84b4db2459c",
+      "to_version": "be4de62af4a94625"
+    },
+    {
+      "action": "save",
+      "from_version": "be4de62af4a94625",
+      "to_version": "d663cc3072124175"
+    },
+    {
+      "action": "restore",
+      "from_version": "d663cc3072124175",
+      "to_version": "0eae0e2defd7443c"
+    }
+  ],
+  "initial_creation_implementation_sha256": {
+    "src/reconstruction_probe/project_history.py": "0c4027e3e3c0a7a2b2c0bdd02b2b39edaa6f185681a591cd6a1550f7d8db5a88",
+    "src/reconstruction_probe/web_studio.py": "12375ccf32b79872821546f5d1f4dcdf76879977b7fbcdf73d51238dce9e4c4c",
+    "web/studio/project_history.js": "30962725c02f00129fc5fbb8f4b9863cfcbf7f463f29389f887f593766ecde68",
+    "web/studio/app.js": "7aee4f0489cb99374eb4ff52b2e31133a04984fdcc3d6750fbd3f680e52260da",
+    "web/studio/index.html": "18d5342e460822dcf920496de5919d54b8aece7f8ae0ec2b69ff585fa81b1fa0",
+    "scripts/check_project_history_live.py": "2efb4cf0832294607ff65aa61dcc9c8a48ddd7dbdc02bafa05d7857fc4b6fabf"
+  },
+  "final_service_readback": {
+    "status": "final_service_restored_persistent_history_and_pinned_previews",
+    "versions": 4,
+    "preserved_state_sha256": "d491a08af198af98be092fd3df31bb7b3842f7e577073955a101e2984cd20350",
+    "active": "0eae0e2defd7443c",
+    "new_versions_created_during_final_readback": 0,
+    "previews": [
+      {
+        "version_id": "be4de62af4a94625",
+        "model_sha256": "3088a76edb6aba8dc3e7129c62905caad6f962064f142efa9ef84207ff86284a",
+        "display_points": 9657,
+        "xyz_payload_sha256": "34d3e31b7c93b25890b0dcd9c57149bb488c9d9e114a74b70703cc29dad092ba"
+      },
+      {
+        "version_id": "cdeab84b4db2459c",
+        "model_sha256": "ae2a4000f1eb1f14affbae7630839bfd0d49e9950b309e75391b619d6e8b0a38",
+        "display_points": 9682,
+        "xyz_payload_sha256": "42bb3a2a389cd550c3da4096efb45935df191567eeef5240cdec5c7863c9d17d"
+      }
+    ],
+    "initial_replay": "initial/summary.json",
+    "initial_replay_sha256": "4655c9d355ca2972a2f3b6e3e6c18e15deb079687ef2326f92dd665b6995e796",
+    "python_tests": 189,
+    "actual_new_browser_verified": false,
+    "implementation_sha256": {
+      "src/reconstruction_probe/project_history.py": "67b50bb7f678a97ed8ee9a71e0ffc3aec30a1f3040671d6eeb54fde667c0b866",
+      "src/reconstruction_probe/web_studio.py": "12375ccf32b79872821546f5d1f4dcdf76879977b7fbcdf73d51238dce9e4c4c",
+      "web/studio/project_history.js": "30962725c02f00129fc5fbb8f4b9863cfcbf7f463f29389f887f593766ecde68",
+      "web/studio/app.js": "b2e0bc5fa3e4a1bffd3737717998383fc7aa2017837fc50fd987318fcb2756cf",
+      "web/studio/index.html": "18d5342e460822dcf920496de5919d54b8aece7f8ae0ec2b69ff585fa81b1fa0",
+      "scripts/check_project_history_live.py": "93559012290594b9986c3121cde1146589cad18bd68030d396c63ab2d4c7891e"
+    }
+  },
+  "source_model_sha256": {
+    "reports/range2-study-20261018/reconstruction/scan_20261018131222/tsdf_pointcloud_mm.ply": "e41fecc5da45f76d5dd346368ca0ed09460ccff4811e3fbc465ba7dbb72082f2",
+    "reports/web-studio/runs/465fdb3b59b740b2/result/nodes/saved/scan_20261018131222/tsdf_pointcloud_mm.ply": "3088a76edb6aba8dc3e7129c62905caad6f962064f142efa9ef84207ff86284a",
+    "reports/web-studio/runs/465fdb3b59b740b2/result/nodes/corrected/scan_20261018131222/tsdf_pointcloud_mm.ply": "ae2a4000f1eb1f14affbae7630839bfd0d49e9950b309e75391b619d6e8b0a38"
+  },
+  "actual_shared_viewer_cpu_rasters": [
+    {
+      "display_points": 9657,
+      "visible_pixels": 40027,
+      "width": 800,
+      "height": 600
+    },
+    {
+      "display_points": 9682,
+      "visible_pixels": 39499,
+      "width": 800,
+      "height": 600
+    }
+  ],
+  "python_tests": 189,
+  "node_checks": 6,
+  "source_integrity": {
+    "projects": 29,
+    "files": 388,
+    "bytes": 3031514347,
+    "all_required_files_match": true
+  },
+  "stale_state_rejected": true,
+  "wrong_model_sha_rejected": true,
+  "old_branch_retained": true,
+  "redo_cleared_on_new_branch": true,
+  "limitations": [
+    "This is automated HTTP state-transition replay, not human use of the browser or approval of geometric accuracy.",
+    "History restores exact model selection and provenance references, not mutable algorithm state or deleted raw frames.",
+    "Per-snapshot reference hashes are verified; browsing history does not re-decode every raw payload referenced by an old fusion plan.",
+    "No scanner connection, language-model agent, new whole-scan repair or calibrated physical accuracy is demonstrated."
+  ],
+  "renderer_initialization_error_checked": true
+}
