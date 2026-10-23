@@ -61,6 +61,7 @@ HANDOFF.md                 当前进度、问题、验收与续接入口
 - [工程结果版本与撤销重做](docs/project-result-history.md)
 - [未完成对应点草稿与恢复](docs/landmark-drafts.md)
 - [局部几何约束与错配诊断](docs/local-constraint-diagnostics.md)
+- [原深度双向检查与视图数量](docs/reserved-view-density.md)
 - [对应点结果到原帧重融合](docs/fragment-fusion-bridge.md)
 - [备份范围与恢复方法](docs/backup-and-restore.md)
 - [仓库内的研究快照](research/snapshots/2026-10-20/README.md)

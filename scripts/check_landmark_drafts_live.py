@@ -67,7 +67,7 @@ def main():
         if len(snapshots)!=2:raise ValueError('Expected exactly two recorded replay snapshots')
     restore=request('/api/landmark-drafts?workbench='+item['id']+'&draft_id='+snapshots[-1]+'&page_sha256='+server['page_sha256'])
     if restore['draft']!=draft:raise ValueError('HTTP draft content did not round trip')
-    
+
     if not args.resume:save('after.json',context);save('restored-draft.json',dict(id=snapshots[-1],draft=draft))
     check=subprocess.run([args.node,'tests/check_landmark_drafts_http.cjs',str(out/'served-workbench.html'),str(out/'restored-draft.json'),f'http://127.0.0.1:{args.port}'],cwd=root,capture_output=True,text=True,encoding='utf-8',check=True)
     controller=json.loads(check.stdout);save('controller.json',controller)
