@@ -32,6 +32,8 @@ from .path_mapping import PathMapper
 from .web_fragments import FragmentEditorService, save as write_json_record
 from .project_history import ProjectHistory
 from .landmark_drafts import LandmarkDrafts
+from .frame_drafts import FrameDrafts
+from .fusion_settings import fusion_settings
 
 
 def read(path):
@@ -106,6 +108,7 @@ class Studio:
         self.fragments=FragmentEditorService(self)
         self.history=ProjectHistory(self)
         self.landmark_drafts=LandmarkDrafts(self)
+        self.frame_drafts=FrameDrafts(self)
 
     def read(self, path):
         return self.paths.record(read(self.paths.resolve(path)))
@@ -404,6 +407,7 @@ class Studio:
                      '--notes','来自Web工程工作区的自选模型。原始点和模型不覆盖；同一物理位置需人工判断。']
             (folder/'selection.json').write_text(json.dumps(dict(source=source,target=target),ensure_ascii=False,indent=2),encoding='utf-8')
         elif kind=='fragment_fusion':
+            if set(request)!={'kind','review_id','plan_sha256','review_sha256'}:raise ValueError('执行只接受已核验版本，参数修改后需重新核验')
             review_folder,review,review_bytes=self.fragments.load_review(request.get('review_id'),request.get('plan_sha256'),request.get('review_sha256'))
             folder.mkdir(parents=True)
             command=[sys.executable,str(self.root/'scripts/run_fragment_fusion_pair.py'),
@@ -471,6 +475,12 @@ class Studio:
         if identifier not in self.jobs:raise ValueError('未知任务')
         job=dict(self.jobs[identifier]);folder=Path(job['folder']);log=folder/'process.log'
         job['log']=log.read_text(encoding='utf-8',errors='replace')[-14000:] if log.is_file() else ''
+        if job.get('kind')=='fragment_fusion':
+            try:
+                raw=(folder/'review-original.json').read_bytes()
+                if hashlib.sha256(raw).hexdigest()!=job.get('reviewed_record_sha256'):raise ValueError('核验参数副本版本不一致')
+                job['reviewed_fusion_parameters']=fusion_settings(json.loads(raw.decode('utf-8')).get('fusion_parameters'))
+            except (ValueError,KeyError,TypeError,OSError):job['review_parameters_unavailable']='核验参数记录不可用'
         state=folder/'result/state.json'
         if state.is_file():
             try:job['workflow']=self.read(state)
@@ -502,6 +512,7 @@ def make_handler(studio):
                 elif parsed.path=='/api/depth.png':self.send(studio.depth_image(get('scan'),int(get('ordinal',0))),'image/png')
                 elif parsed.path=='/api/history':self.send(studio.history.context(get('scan')))
                 elif parsed.path=='/api/landmark-drafts':self.send(studio.landmark_drafts.context(get('workbench'),get('draft_id',None),get('page_sha256',None)))
+                elif parsed.path=='/api/frame-drafts':self.send(studio.frame_drafts.context(get('scan'),get('draft_id'),get('index_sha256')))
                 elif parsed.path=='/api/fragments/context':self.send(studio.fragments.context(get('scan')))
                 elif parsed.path=='/api/jobs':self.send([studio.job(key) for key in studio.jobs])
                 elif parsed.path.startswith('/api/jobs/'):self.send(studio.job(parsed.path.rsplit('/',1)[1]))
@@ -528,6 +539,8 @@ def make_handler(studio):
                 if self.path=='/api/jobs':self.send(studio.start_job(request),status=202)
                 elif self.path=='/api/history':self.send(studio.history.change(request))
                 elif self.path=='/api/landmark-drafts':self.send(studio.landmark_drafts.save(request),status=201)
+                elif self.path=='/api/frame-drafts':self.send(studio.frame_drafts.save(request),status=201)
+                elif self.path=='/api/frame-drafts/inspect':self.send(studio.frame_drafts.inspect(request))
                 elif self.path=='/api/fragments/reviews':self.send(studio.fragments.preview(request),status=201)
                 elif self.path.startswith('/api/jobs/') and self.path.endswith('/cancel'):
                     identifier=self.path.split('/')[3];job=studio.job(identifier)

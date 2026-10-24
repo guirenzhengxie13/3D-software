@@ -1,0 +1,166 @@
+{
+  "checked_at_utc": "2026-10-24T17:41:02.548374+00:00",
+  "scan_id": "scan_20261018131222",
+  "draft_ids": [
+    "653f1d971dd84b4a",
+    "1deac371f43e47cc"
+  ],
+  "draft_state_sha256": "f6751962cc98d07ac9366ae9fdb73dbab34f5fbd46cb5fd609c3f69ba5396032",
+  "draft_count": 2,
+  "controller": {
+    "served_real_controller": true,
+    "http_restored_snapshots": [
+      {
+        "id": "653f1d971dd84b4a",
+        "partial_roi": true,
+        "source_frames_exact": "31-88,",
+        "fusion_fields": {
+          "voxel_mm": "0.8",
+          "truncation_mm": "",
+          "edge_threshold_mm": "3.0",
+          "weight_threshold": "3.0"
+        }
+      },
+      {
+        "id": "1deac371f43e47cc",
+        "partial_roi": false,
+        "source_frames_exact": "31-88,90-108,110-115",
+        "fusion_fields": {
+          "voxel_mm": "0.8",
+          "truncation_mm": "3.2",
+          "edge_threshold_mm": "3.0",
+          "weight_threshold": "3.0"
+        }
+      }
+    ],
+    "coordinate_confirmation_and_review_cleared": true,
+    "portable_export_matches": true,
+    "no_job_or_review_submission": true,
+    "actual_browser_gpu": false
+  },
+  "review_id": "24b92e0fbbbd4b69",
+  "job_id": "8197aff465a34cf7",
+  "fusion_parameters": {
+    "voxel_mm": 0.8,
+    "truncation_mm": 3.2,
+    "edge_threshold_mm": 3.0,
+    "weight_threshold": 3.0
+  },
+  "surfaces": [
+    {
+      "points": 37762,
+      "model_sha256": "05fea783b65ae546286d0e2ce68718c83e00e835104111b47dd195cbc9f38711",
+      "cpu_raster": {
+        "display_points": 37762,
+        "visible_pixels": 48464,
+        "width": 800,
+        "height": 600
+      }
+    },
+    {
+      "points": 37186,
+      "model_sha256": "4de4706ceea60acdcefdec2b0b6ba73507e8a7a4f6aacc4ba049f624df0e3bc7",
+      "cpu_raster": {
+        "display_points": 37186,
+        "visible_pixels": 47954,
+        "width": 800,
+        "height": 600
+      }
+    }
+  ],
+  "model_history_unchanged": true,
+  "model_history_sha256": "d491a08af198af98be092fd3df31bb7b3842f7e577073955a101e2984cd20350",
+  "scope": "114 of 336 saved records; all selected enter fusion; other 222 excluded; no new physical accuracy or whole failed-scan repair claim",
+  "code_sha256": {
+    "src/reconstruction_probe/frame_drafts.py": "f714e7ca77e83a6ec99f8eb7f4ff6a10ce7b7d8c09b75cff8fff6807e933a281",
+    "src/reconstruction_probe/fusion_settings.py": "5803e29e682e4ccba2f29e9e2d4d82449149a33408b1d17eb6e698834c504ab6",
+    "src/reconstruction_probe/web_fragments.py": "3d0424b1106773a2d7d04c04ce78f3ce5080ff05bd1c070dd3c57cfe89427891",
+    "src/reconstruction_probe/fragment_plan.py": "fd23a92710f2d2e2745157713379f7df8bbe0399fd4a7ef9ab9214d4b3c5a5ab",
+    "src/reconstruction_probe/web_studio.py": "4a0a9cd729a74e0d48b1c3fb8ef5e280140b3e1c57104263f95533f2f75c8948",
+    "web/studio/fragment_editor.js": "42bcb083f471fe240af7f4f37b8fd9f4851377b51b09345f5980a7ceee400b24",
+    "web/studio/index.html": "d45c8be471de4b7063d5155b7855b43e41a50d18a1681736b16dfbb64a098ab8",
+    "scripts/reconstruct_fragment_plan.py": "2e6755a792280968a6450c512fc6c6bbf8a67d81e00b32c0ff9b94d18751bb51",
+    "scripts/run_fragment_fusion_pair.py": "5bc5c38f47f14154dbee2eaedb25532e43470df65ba073256e5fab224a6b4473",
+    "scripts/check_frame_drafts_live.py": "ef2ecead6b01fda60118fe4b48dc1cee4f3ae594903fd819c8fcf69c530f8f75",
+    "tests/check_frame_drafts_http.cjs": "edb4543e4b87042ce2f7574c39a6f5971210b4638e0a91ff489dc938aa968be7"
+  },
+  "original_source_audit": {
+    "projects": 29,
+    "required_source_files": 388,
+    "source_bytes_read": 3031514347,
+    "all_required_source_files_match": true
+  },
+  "validation": {
+    "python_tests": 215,
+    "new_frame_draft_tests": 9,
+    "new_settings_tests": 6,
+    "actual_chrome_gpu": false
+  },
+  "final_restart_readback": {
+    "checked_at_utc": "2026-10-24T17:50:34.357663+00:00",
+    "frame_draft_state_sha256": "f6751962cc98d07ac9366ae9fdb73dbab34f5fbd46cb5fd609c3f69ba5396032",
+    "frame_drafts": 2,
+    "landmark_draft_state_sha256": "672ae36ee1d2e5d9c09e47316b5ccaf4cba0fe9b49ac7cf96933f57b8e265e75",
+    "model_history_sha256": "d491a08af198af98be092fd3df31bb7b3842f7e577073955a101e2984cd20350",
+    "model_versions": 4,
+    "jobs": 7,
+    "active_jobs": 0,
+    "job_id": "8197aff465a34cf7",
+    "reviewed_fusion_parameters": {
+      "voxel_mm": 0.8,
+      "truncation_mm": 3.2,
+      "edge_threshold_mm": 3.0,
+      "weight_threshold": 3.0
+    },
+    "catalog_summary": {
+      "frames": 11932,
+      "observations": 370243304,
+      "projects": 33,
+      "models": 117
+    },
+    "controller": {
+      "served_real_controller": true,
+      "http_restored_snapshots": [
+        {
+          "id": "653f1d971dd84b4a",
+          "partial_roi": true,
+          "source_frames_exact": "31-88,",
+          "fusion_fields": {
+            "voxel_mm": "0.8",
+            "truncation_mm": "",
+            "edge_threshold_mm": "3.0",
+            "weight_threshold": "3.0"
+          }
+        },
+        {
+          "id": "1deac371f43e47cc",
+          "partial_roi": false,
+          "source_frames_exact": "31-88,90-108,110-115",
+          "fusion_fields": {
+            "voxel_mm": "0.8",
+            "truncation_mm": "3.2",
+            "edge_threshold_mm": "3.0",
+            "weight_threshold": "3.0"
+          }
+        }
+      ],
+      "coordinate_confirmation_and_review_cleared": true,
+      "portable_export_matches": true,
+      "no_job_or_review_submission": true,
+      "actual_browser_gpu": false
+    },
+    "final_code_sha256": {
+      "src/reconstruction_probe/frame_drafts.py": "f714e7ca77e83a6ec99f8eb7f4ff6a10ce7b7d8c09b75cff8fff6807e933a281",
+      "src/reconstruction_probe/fusion_settings.py": "5803e29e682e4ccba2f29e9e2d4d82449149a33408b1d17eb6e698834c504ab6",
+      "src/reconstruction_probe/web_fragments.py": "3d0424b1106773a2d7d04c04ce78f3ce5080ff05bd1c070dd3c57cfe89427891",
+      "src/reconstruction_probe/fragment_plan.py": "fd23a92710f2d2e2745157713379f7df8bbe0399fd4a7ef9ab9214d4b3c5a5ab",
+      "src/reconstruction_probe/web_studio.py": "194f431985e7972342f9e5a4f7a05139cfd764959d23aadde94a787d0537e032",
+      "web/studio/fragment_editor.js": "a9fe95d60cfdceca4de7e096fe05fbde26b3984507eb7788771cfd9e07a87317",
+      "web/studio/index.html": "d45c8be471de4b7063d5155b7855b43e41a50d18a1681736b16dfbb64a098ab8",
+      "scripts/reconstruct_fragment_plan.py": "2e6755a792280968a6450c512fc6c6bbf8a67d81e00b32c0ff9b94d18751bb51",
+      "scripts/run_fragment_fusion_pair.py": "5bc5c38f47f14154dbee2eaedb25532e43470df65ba073256e5fab224a6b4473",
+      "scripts/check_frame_drafts_live.py": "ef2ecead6b01fda60118fe4b48dc1cee4f3ae594903fd819c8fcf69c530f8f75",
+      "tests/check_frame_drafts_http.cjs": "edb4543e4b87042ce2f7574c39a6f5971210b4638e0a91ff489dc938aa968be7"
+    }
+  }
+}

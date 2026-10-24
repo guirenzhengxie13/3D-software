@@ -8,6 +8,7 @@ import re
 import numpy as np
 
 from .offline import file_sha256
+from .fusion_settings import fusion_settings
 
 from .multi_scan import FrameKey, rigid
 
@@ -20,6 +21,7 @@ def compile_fragment_plan(plan, scan_id, index_sha256, available_frame_ids):
     if plan.get('unit')!='mm':raise ValueError('Fragment transforms must declare unit mm')
     if not isinstance(plan.get('decision'),str) or not plan['decision'].strip():
         raise ValueError('An explicit selection decision/provenance is required')
+    settings=fusion_settings(plan.get('fusion_parameters'))
     rows=plan.get('fragments')
     if not isinstance(rows,list) or not rows:raise ValueError('At least one fragment is required')
     available=set(available_frame_ids);fragments={};ownership={}
@@ -45,7 +47,7 @@ def compile_fragment_plan(plan, scan_id, index_sha256, available_frame_ids):
         active.remove(fragment);corrections[fragment]=matrix
         return matrix
     for fragment in fragments:visit(fragment)
-    return dict(corrections=corrections,ownership=ownership,selected_frame_ids=sorted(key.frame_id for key in ownership))
+    return dict(fusion_parameters=settings,corrections=corrections,ownership=ownership,selected_frame_ids=sorted(key.frame_id for key in ownership))
 
 
 def load_fragment_inputs(plan_path, index_path, mapper):

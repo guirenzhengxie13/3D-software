@@ -30,7 +30,7 @@ py -3.12 -m venv .venv
 - **对应点**：选择固定/移动模型，保存和恢复未完成选点草稿，核验刚体变换；显式绑定原帧，审阅输入后运行原位姿与校正位姿两组重融合。
 - **实验与任务**：保留融合候选、失败尝试、来源证据、处理参数、日志与状态。
 
-当前没有连接语言模型Agent服务。同一工程的显式帧归属、对应点核验与原深度重融合已接通网页、CLI和固定工作流。模型组合可保存为固定版本，切换支持撤销重做；跨工程通用绑定与完整参数/帧编辑历史仍在开发。
+当前没有连接语言模型Agent服务。同一工程的显式帧归属、对应点核验与原深度重融合已接通网页、CLI和固定工作流。模型组合可保存为固定版本，切换支持撤销重做；原帧/ROI/参数表单也可另存草稿并恢复；跨工程通用绑定与完整编辑历史仍在开发。
 
 ## 数据与验证边界
 
@@ -60,6 +60,7 @@ HANDOFF.md                 当前进度、问题、验收与续接入口
 - [网页原帧绑定与两组重融合](docs/web-fragment-workflow.md)
 - [工程结果版本与撤销重做](docs/project-result-history.md)
 - [未完成对应点草稿与恢复](docs/landmark-drafts.md)
+- [原帧、ROI与融合参数草稿](docs/frame-editing-drafts.md)
 - [局部几何约束与错配诊断](docs/local-constraint-diagnostics.md)
 - [原深度双向检查与视图数量](docs/reserved-view-density.md)
 - [对应点结果到原帧重融合](docs/fragment-fusion-bridge.md)

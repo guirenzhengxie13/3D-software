@@ -48,8 +48,9 @@ def main():
             kept=np.all((native>=bounds[0])&(native<=bounds[1]),axis=1);result.ravel()[ids[~kept]]=0;removed=int((~kept).sum())
         digest.update(np.array([rid],'<u8').tobytes()+result.astype('<f4').tobytes());selected_count+=1
         return result,removed
-    result=reconstruct(decoded,out,.6,2.4,3.,1,True,pose_overrides=overrides,frame_depth_filter=select_depth,
-        evaluate_vendor=False,bounds_override_mm=bounds,tsdf_backend='tensor',tsdf_weight_threshold=3.,
+    settings=compiled['fusion_parameters']
+    result=reconstruct(decoded,out,settings['voxel_mm'],settings['truncation_mm'],settings['edge_threshold_mm'],1,True,pose_overrides=overrides,frame_depth_filter=select_depth,
+        evaluate_vendor=False,bounds_override_mm=bounds,tsdf_backend='tensor',tsdf_weight_threshold=settings['weight_threshold'],
         coordinate_frame='explicit_fragment_component_'+index['scan_id'],
         reconstruction_note='Explicit fragment plan: '+plan['decision']+('; saved-pose control' if args.saved_control else '; hierarchical corrections applied')+'. All selected depths now integrated, including earlier reserved records; this output is a demonstration, not heldout evaluation.')
     if selected_count!=len(original) or result['integrated_frames']!=len(original):raise ValueError('Selected fragment frames were not integrated exactly once')
@@ -59,7 +60,7 @@ def main():
         if file_sha256(Path(name))!=expected:raise ValueError('Pinned fusion input changed during integration: '+name)
     np.savez_compressed(out/'applied-poses.npz',**{f'pose_{rid}':matrix for rid,matrix in overrides.items()})
     summary=dict(status='explicit_fragment_component_candidate_not_promoted',scan_id=index['scan_id'],saved_control=args.saved_control,
-        decision=plan['decision'],selected_frames=len(original),selected_frame_ids=compiled['selected_frame_ids'],
+        decision=plan['decision'],fusion_parameters=settings,selected_frames=len(original),selected_frame_ids=compiled['selected_frame_ids'],
         selected_depth_with_frame_ids_sha256=digest.hexdigest(),quality=result['quality'],
         corrections_by_fragment={str(key):value.tolist() for key,value in corrections.items()},
         frame_fragment_ids={str(key.frame_id):fragment for key,fragment in compiled['ownership'].items()},

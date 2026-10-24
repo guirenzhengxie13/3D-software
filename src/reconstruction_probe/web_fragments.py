@@ -12,6 +12,7 @@ from .fragment_bridge import build_fragment_plan, read_json
 from .fragment_plan import load_fragment_inputs
 from .multi_scan import FrameKey, rigid
 from .offline import file_sha256
+from .fusion_settings import fusion_settings, DEFAULT_FUSION_SETTINGS, FUSION_RANGES
 
 
 def now():
@@ -98,7 +99,7 @@ class FragmentEditorService:
                     rigid(row['transform']);labels.append(row['label'])
                 if not labels or len(set(labels))!=len(labels):continue
                 key=hashlib.sha256(str(summary_path).encode()).hexdigest()[:16]
-                result[key]=dict(id=key,label=label,directory=folder,sha256=file_sha256(summary_path),candidates=labels,
+                result[key]=dict(id=key,label=label,directory=folder,relative_path=summary_path.relative_to(self.root).as_posix(),sha256=file_sha256(summary_path),candidates=labels,
                     source=dict(path=models['source']['path'],sha256=session['source']['sha256'],label=models['source']['label']),
                     target=dict(path=models['target']['path'],sha256=session['target']['sha256'],label=models['target']['label']))
             except (ValueError,KeyError,TypeError,OSError):continue
@@ -136,12 +137,13 @@ class FragmentEditorService:
             availability='file_presence_only_full_payload_checked_when_reviewing',
             alignments=[{k:v for k,v in a.items() if k!='directory'} for a in alignments.values()],
             presets=self._presets(scan_id,digest,alignments),
-            coordinate_contract='saved_scan_mm',single_scan_only=True)
+            coordinate_contract='saved_scan_mm',single_scan_only=True,fusion_defaults=DEFAULT_FUSION_SETTINGS.copy(),fusion_ranges=FUSION_RANGES)
 
     def preview(self, request):
         allowed={'scan_id','index_sha256','alignment_id','alignment_sha256','candidate','mode','source_frames','target_frames',
-                 'source_basis','target_basis','decision','coordinate_confirmed','roi','preset_id','preset_sha256'}
+                 'source_basis','target_basis','decision','coordinate_confirmed','roi','preset_id','preset_sha256','fusion_parameters'}
         if not isinstance(request,dict) or set(request)-allowed:raise ValueError('帧归属表单包含未知字段')
+        parameters=fusion_settings(request.get('fusion_parameters'))
         if request.get('coordinate_confirmed') is not True:raise ValueError('请确认两模型使用原保存扫描毫米坐标，并填写依据')
         scan_id=request.get('scan_id');index_path,index,index_sha,ids=self._index(scan_id,request.get('index_sha256'))
         if request.get('index_sha256')!=index_sha:raise ValueError('需要当前工程索引版本')
@@ -173,13 +175,14 @@ class FragmentEditorService:
         try:
             folder.mkdir(parents=True);save(folder/'binding.json',binding)
             plan,audit=build_fragment_plan(index_path.parent,folder/'binding.json',alignment['directory'],candidate,self.mapper)
+            plan['fusion_parameters']=parameters
             save(folder/'fragment-plan.json',plan)
             review=dict(id=review_id,status='ready',created_at=now(),scan_id=scan_id,alignment_id=alignment['id'],candidate=candidate,
                 decoded=str(index_path.parent),plan_sha256=file_sha256(folder/'fragment-plan.json'),
                 binding_sha256=file_sha256(folder/'binding.json'),summary=audit,
                 source_frame_ids=[str(i) for i in selected['source']],target_frame_ids=[str(i) for i in selected['target']],
                 roi=binding.get('selection_roi_original_scan_mm'),execution_origin='web_form_request_not_proof_of_human_review',
-                fusion_parameters=dict(voxel_mm=.6,truncation_mm=2.4,edge_threshold_mm=3.,weight_threshold=3.))
+                fusion_parameters=parameters)
             save(folder/'review.json',review);return dict(review,review_sha256=file_sha256(folder/'review.json'))
         except Exception as error:
             if folder.is_dir():save(folder/'review.json',dict(id=review_id,status='rejected',scan_id=scan_id,error=str(error),created_at=now()))
@@ -200,6 +203,8 @@ class FragmentEditorService:
         index_path,_,_,_=self._index(record['scan_id']);decoded=self.mapper.resolve(record['decoded'])
         if decoded!=index_path.parent:raise ValueError('核验记录不属于当前工程原帧目录')
         plan,index,pins=load_fragment_inputs(plan_path,decoded/'index.json',self.mapper)
+        if pins[str(plan_path)]!=expected:raise ValueError('计划在加载期间变化，请重新核验')
+        if fusion_settings(plan.get('fusion_parameters'))!=fusion_settings(record.get('fusion_parameters')):raise ValueError('计划与核验的融合参数不一致')
         if plan['decoded_index_sha256']!=pins[str(decoded/'index.json')]:raise ValueError('工程索引已变化，请重新核验')
         return folder,record,raw
 
