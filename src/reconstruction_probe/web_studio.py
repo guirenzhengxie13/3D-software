@@ -47,6 +47,7 @@ def pack(xyz, rgb, ids):
 
 
 LABELS = {
+    'fusion-setting-response-20261025':'同帧参数响应 · 表面差异与原深度回查',
     'reserved-view-density-20261024':'原深度证据 · 双向检查与视图数量',
     'landmark-layout-sensitivity-20261023':'选点布局 · 合成扰动敏感性',
     'cup-local-constraints-20261022':'失败扫描 · 局部几何约束与错配风险',
@@ -65,6 +66,7 @@ LABELS = {
     'official-fusion-comparison':'官方融合与自研结果', 'comparison':'原扫描预览与自研结果',
 }
 EXPERIMENT_STATUS={
+    'fusion-setting-response-20261025':'相同原帧/应用位姿与入口代码；比较体素/截断组合，极端差异另查原深度',
     'reserved-view-density-20261024':'168组旧计数复现；固定源像素比较视图相位，不把零冲突当重建成功',
     'landmark-layout-sensitivity-20261023':'相近选点残差可伴随不同整体位移；已知单位真值的合成试验，不是实测扫描精度',
     'cup-local-constraints-20261022':'7条冻结连接的局部谱；结合原深度证据，高局部约束不代表对齐正确',
@@ -229,7 +231,7 @@ class Studio:
             if (folder/'current-review.html').is_file():preferred=folder/'current-review.html'
             elif folder.name=='fragment-bridge-20261021' and (folder/'verified/review.html').is_file():preferred=folder/'verified/review.html'
             if preferred.is_file():experiments[-1]['primary_url']=self.url(preferred)
-        priority=['fragment-bridge-20261021','reserved-view-density-20261024','cup-local-constraints-20261022','landmark-layout-sensitivity-20261023','official-fusion-comparison','cup-direct-split','cup-multi-scan-tsdf','cup-roi','tensor-tsdf','cup-first-segment-component']
+        priority=['fragment-bridge-20261021','fusion-setting-response-20261025','reserved-view-density-20261024','cup-local-constraints-20261022','landmark-layout-sensitivity-20261023','official-fusion-comparison','cup-direct-split','cup-multi-scan-tsdf','cup-roi','tensor-tsdf','cup-first-segment-component']
         experiments.sort(key=lambda row:(priority.index(row['id']) if row['id'] in priority else len(priority),row['id']))
         for base in [self.study,self.root/'reports/pointcloud-scale-20261019',self.output]:
             for p in sorted(base.rglob('*.html')):
