@@ -1,0 +1,664 @@
+{
+  "status": "frozen_2x2_parameter_response_not_physical_accuracy",
+  "selected_frames": 114,
+  "original_pixel_sha256": "5c899c637d54df68f358d9bcdb597689ce32b97a08f0d2031de2cd8a8e621736",
+  "same_applied_pose_arrays": true,
+  "source_payload_files_per_arm": 229,
+  "configs": [
+    {
+      "key": "v06-t24",
+      "job": "8a0b007863984e19",
+      "settings": {
+        "voxel_mm": 0.6,
+        "truncation_mm": 2.4,
+        "edge_threshold_mm": 3.0,
+        "weight_threshold": 3.0
+      },
+      "arms": [
+        {
+          "arm": "saved",
+          "points": 67226,
+          "effective_parameters": {
+            "voxel_mm": 0.6,
+            "truncation_mm": 2.4,
+            "edge_threshold_mm": 3.0,
+            "weight_threshold": 3.0
+          },
+          "execution_evidence": "current_core_read_only_replay_exact_whole_pointset"
+        },
+        {
+          "arm": "corrected",
+          "points": 66376,
+          "effective_parameters": {
+            "voxel_mm": 0.6,
+            "truncation_mm": 2.4,
+            "edge_threshold_mm": 3.0,
+            "weight_threshold": 3.0
+          },
+          "execution_evidence": "current_core_read_only_replay_exact_whole_pointset"
+        }
+      ]
+    },
+    {
+      "key": "v06-t32",
+      "job": "2fe5c4f96ca241dc",
+      "settings": {
+        "voxel_mm": 0.6,
+        "truncation_mm": 3.2,
+        "edge_threshold_mm": 3.0,
+        "weight_threshold": 3.0
+      },
+      "arms": [
+        {
+          "arm": "saved",
+          "points": 67418,
+          "effective_parameters": {
+            "voxel_mm": 0.6,
+            "truncation_mm": 3.2,
+            "edge_threshold_mm": 3.0,
+            "weight_threshold": 3.0
+          },
+          "execution_evidence": "actual_volume_diagnostics_and_pinned_workflow_entry"
+        },
+        {
+          "arm": "corrected",
+          "points": 66506,
+          "effective_parameters": {
+            "voxel_mm": 0.6,
+            "truncation_mm": 3.2,
+            "edge_threshold_mm": 3.0,
+            "weight_threshold": 3.0
+          },
+          "execution_evidence": "actual_volume_diagnostics_and_pinned_workflow_entry"
+        }
+      ]
+    },
+    {
+      "key": "v08-t24",
+      "job": "1b36863d9dff46c3",
+      "settings": {
+        "voxel_mm": 0.8,
+        "truncation_mm": 2.4,
+        "edge_threshold_mm": 3.0,
+        "weight_threshold": 3.0
+      },
+      "arms": [
+        {
+          "arm": "saved",
+          "points": 37663,
+          "effective_parameters": {
+            "voxel_mm": 0.8,
+            "truncation_mm": 2.4,
+            "edge_threshold_mm": 3.0,
+            "weight_threshold": 3.0
+          },
+          "execution_evidence": "actual_volume_diagnostics_and_pinned_workflow_entry"
+        },
+        {
+          "arm": "corrected",
+          "points": 37088,
+          "effective_parameters": {
+            "voxel_mm": 0.8,
+            "truncation_mm": 2.4,
+            "edge_threshold_mm": 3.0,
+            "weight_threshold": 3.0
+          },
+          "execution_evidence": "actual_volume_diagnostics_and_pinned_workflow_entry"
+        }
+      ]
+    },
+    {
+      "key": "v08-t32",
+      "job": "8197aff465a34cf7",
+      "settings": {
+        "voxel_mm": 0.8,
+        "truncation_mm": 3.2,
+        "edge_threshold_mm": 3.0,
+        "weight_threshold": 3.0
+      },
+      "arms": [
+        {
+          "arm": "saved",
+          "points": 37762,
+          "effective_parameters": {
+            "voxel_mm": 0.8,
+            "truncation_mm": 3.2,
+            "edge_threshold_mm": 3.0,
+            "weight_threshold": 3.0
+          },
+          "execution_evidence": "current_core_read_only_replay_exact_whole_pointset"
+        },
+        {
+          "arm": "corrected",
+          "points": 37186,
+          "effective_parameters": {
+            "voxel_mm": 0.8,
+            "truncation_mm": 3.2,
+            "edge_threshold_mm": 3.0,
+            "weight_threshold": 3.0
+          },
+          "execution_evidence": "current_core_read_only_replay_exact_whole_pointset"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "arm": "saved",
+      "counts": {
+        "v06-t24": 67226,
+        "v06-t32": 67418,
+        "v08-t24": 37663,
+        "v08-t32": 37762
+      },
+      "comparisons": [
+        {
+          "key": "voxel-t24",
+          "parameter": "voxel_mm",
+          "left": "v06-t24",
+          "right": "v08-t24",
+          "left_points": 67226,
+          "right_points": 37663,
+          "point_count_delta": -29563,
+          "left_to_right": {
+            "points": 67226,
+            "median_mm": 0.2912795429145002,
+            "p95_mm": 0.5084615770395263,
+            "maximum_mm": 8.073191494874738,
+            "within_1mm_fraction": 0.9989438610061583
+          },
+          "right_to_left": {
+            "points": 37663,
+            "median_mm": 0.2197991073247582,
+            "p95_mm": 0.348446235456158,
+            "maximum_mm": 20.723540727893795,
+            "within_1mm_fraction": 0.9980352069670498
+          },
+          "page": "saved-voxel-t24.html"
+        },
+        {
+          "key": "voxel-t32",
+          "parameter": "voxel_mm",
+          "left": "v06-t32",
+          "right": "v08-t32",
+          "left_points": 67418,
+          "right_points": 37762,
+          "point_count_delta": -29656,
+          "left_to_right": {
+            "points": 67418,
+            "median_mm": 0.2908524499414566,
+            "p95_mm": 0.5080490426445272,
+            "maximum_mm": 7.741884844842392,
+            "within_1mm_fraction": 0.998961701622712
+          },
+          "right_to_left": {
+            "points": 37762,
+            "median_mm": 0.21919237384111012,
+            "p95_mm": 0.3466524402326825,
+            "maximum_mm": 20.723540727893795,
+            "within_1mm_fraction": 0.9987553625337641
+          },
+          "page": "saved-voxel-t32.html"
+        },
+        {
+          "key": "trunc-v06",
+          "parameter": "truncation_mm",
+          "left": "v06-t24",
+          "right": "v06-t32",
+          "left_points": 67226,
+          "right_points": 67418,
+          "point_count_delta": 192,
+          "left_to_right": {
+            "points": 67226,
+            "median_mm": 0.000396728515625,
+            "p95_mm": 0.12817955017089844,
+            "maximum_mm": 2.841159246991893,
+            "within_1mm_fraction": 0.9998214976348436
+          },
+          "right_to_left": {
+            "points": 67418,
+            "median_mm": 0.00041961669921875,
+            "p95_mm": 0.13469944000244116,
+            "maximum_mm": 2.4006325591708744,
+            "within_1mm_fraction": 0.9991545284642084
+          },
+          "page": "saved-trunc-v06.html"
+        },
+        {
+          "key": "trunc-v08",
+          "parameter": "truncation_mm",
+          "left": "v08-t24",
+          "right": "v08-t32",
+          "left_points": 37663,
+          "right_points": 37762,
+          "point_count_delta": 99,
+          "left_to_right": {
+            "points": 37663,
+            "median_mm": 0.00162506103515625,
+            "p95_mm": 0.1373094558715821,
+            "maximum_mm": 1.8895521806511146,
+            "within_1mm_fraction": 0.9992300135411412
+          },
+          "right_to_left": {
+            "points": 37762,
+            "median_mm": 0.001659393310546875,
+            "p95_mm": 0.1468701362609857,
+            "maximum_mm": 1.865032507813322,
+            "within_1mm_fraction": 0.9991525872570309
+          },
+          "page": "saved-trunc-v08.html"
+        }
+      ],
+      "critical_locations": [
+        {
+          "reference_variant": "fine",
+          "reference_vertex_id": 581,
+          "reference_mm": [
+            58.20000076293945,
+            -28.644582748413086,
+            415.20001220703125
+          ],
+          "nearest": [
+            {
+              "config": "v06-t24",
+              "nearest_mm": 0.0,
+              "nearest_vertex_id": 581
+            },
+            {
+              "config": "v06-t32",
+              "nearest_mm": 0.0,
+              "nearest_vertex_id": 27601
+            },
+            {
+              "config": "v08-t24",
+              "nearest_mm": 0.18936272060013823,
+              "nearest_vertex_id": 23429
+            },
+            {
+              "config": "v08-t32",
+              "nearest_mm": 0.18936272060013823,
+              "nearest_vertex_id": 22927
+            }
+          ]
+        },
+        {
+          "reference_variant": "coarse",
+          "reference_vertex_id": 27957,
+          "reference_mm": [
+            68.0,
+            -12.64505672454834,
+            406.3999938964844
+          ],
+          "nearest": [
+            {
+              "config": "v06-t24",
+              "nearest_mm": 20.723540727893795,
+              "nearest_vertex_id": 581
+            },
+            {
+              "config": "v06-t32",
+              "nearest_mm": 20.723540727893795,
+              "nearest_vertex_id": 27601
+            },
+            {
+              "config": "v08-t24",
+              "nearest_mm": 0.0,
+              "nearest_vertex_id": 23947
+            },
+            {
+              "config": "v08-t32",
+              "nearest_mm": 0.0,
+              "nearest_vertex_id": 27957
+            }
+          ]
+        }
+      ],
+      "count_difference_of_differences": -93
+    },
+    {
+      "arm": "corrected",
+      "counts": {
+        "v06-t24": 66376,
+        "v06-t32": 66506,
+        "v08-t24": 37088,
+        "v08-t32": 37186
+      },
+      "comparisons": [
+        {
+          "key": "voxel-t24",
+          "parameter": "voxel_mm",
+          "left": "v06-t24",
+          "right": "v08-t24",
+          "left_points": 66376,
+          "right_points": 37088,
+          "point_count_delta": -29288,
+          "left_to_right": {
+            "points": 66376,
+            "median_mm": 0.29064904928678137,
+            "p95_mm": 0.5079219892132223,
+            "maximum_mm": 8.68369904601576,
+            "within_1mm_fraction": 0.9986591539110522
+          },
+          "right_to_left": {
+            "points": 37088,
+            "median_mm": 0.21875008270089202,
+            "p95_mm": 0.34612072498164775,
+            "maximum_mm": 2.532801336294723,
+            "within_1mm_fraction": 0.9994068162208801
+          },
+          "page": "corrected-voxel-t24.html"
+        },
+        {
+          "key": "voxel-t32",
+          "parameter": "voxel_mm",
+          "left": "v06-t32",
+          "right": "v08-t32",
+          "left_points": 66506,
+          "right_points": 37186,
+          "point_count_delta": -29320,
+          "left_to_right": {
+            "points": 66506,
+            "median_mm": 0.28998481749348937,
+            "p95_mm": 0.5056070687520625,
+            "maximum_mm": 7.938660624260596,
+            "within_1mm_fraction": 0.9988722822001023
+          },
+          "right_to_left": {
+            "points": 37186,
+            "median_mm": 0.21811382420750908,
+            "p95_mm": 0.34431831985603023,
+            "maximum_mm": 2.532801336294723,
+            "within_1mm_fraction": 0.9994083794976604
+          },
+          "page": "corrected-voxel-t32.html"
+        },
+        {
+          "key": "trunc-v06",
+          "parameter": "truncation_mm",
+          "left": "v06-t24",
+          "right": "v06-t32",
+          "left_points": 66376,
+          "right_points": 66506,
+          "point_count_delta": 130,
+          "left_to_right": {
+            "points": 66376,
+            "median_mm": 0.0,
+            "p95_mm": 0.1099393367767334,
+            "maximum_mm": 1.782682997567879,
+            "within_1mm_fraction": 0.9993672411715078
+          },
+          "right_to_left": {
+            "points": 66506,
+            "median_mm": 0.0,
+            "p95_mm": 0.11388588054244811,
+            "maximum_mm": 1.7716536769919942,
+            "within_1mm_fraction": 0.9996541665413647
+          },
+          "page": "corrected-trunc-v06.html"
+        },
+        {
+          "key": "trunc-v08",
+          "parameter": "truncation_mm",
+          "left": "v08-t24",
+          "right": "v08-t32",
+          "left_points": 37088,
+          "right_points": 37186,
+          "point_count_delta": 98,
+          "left_to_right": {
+            "points": 37088,
+            "median_mm": 4.76837158203125e-07,
+            "p95_mm": 0.1131608963012696,
+            "maximum_mm": 1.4255296287580848,
+            "within_1mm_fraction": 0.9994337791199309
+          },
+          "right_to_left": {
+            "points": 37186,
+            "median_mm": 9.5367431640625e-07,
+            "p95_mm": 0.1201324462890625,
+            "maximum_mm": 2.132661401028327,
+            "within_1mm_fraction": 0.9994352713386758
+          },
+          "page": "corrected-trunc-v08.html"
+        }
+      ],
+      "critical_locations": [
+        {
+          "reference_variant": "fine",
+          "reference_vertex_id": 50670,
+          "reference_mm": [
+            65.4000015258789,
+            -37.845645904541016,
+            423.6000061035156
+          ],
+          "nearest": [
+            {
+              "config": "v06-t24",
+              "nearest_mm": 0.0,
+              "nearest_vertex_id": 50670
+            },
+            {
+              "config": "v06-t32",
+              "nearest_mm": 0.0,
+              "nearest_vertex_id": 10817
+            },
+            {
+              "config": "v08-t24",
+              "nearest_mm": 8.68369904601576,
+              "nearest_vertex_id": 14815
+            },
+            {
+              "config": "v08-t32",
+              "nearest_mm": 7.938660624260596,
+              "nearest_vertex_id": 11585
+            }
+          ]
+        },
+        {
+          "reference_variant": "coarse",
+          "reference_vertex_id": 11585,
+          "reference_mm": [
+            62.67517852783203,
+            -30.39999771118164,
+            424.0
+          ],
+          "nearest": [
+            {
+              "config": "v06-t24",
+              "nearest_mm": 0.49091633004653035,
+              "nearest_vertex_id": 50683
+            },
+            {
+              "config": "v06-t32",
+              "nearest_mm": 0.2923366747611757,
+              "nearest_vertex_id": 11035
+            },
+            {
+              "config": "v08-t24",
+              "nearest_mm": 0.7461511429500813,
+              "nearest_vertex_id": 14815
+            },
+            {
+              "config": "v08-t32",
+              "nearest_mm": 0.0,
+              "nearest_vertex_id": 11585
+            }
+          ]
+        }
+      ],
+      "count_difference_of_differences": -32
+    }
+  ],
+  "limits": [
+    "Only voxel or truncation changes along each reported comparison; both historical controls are exactly reproduced by current-core read-only replays.",
+    "Workflow nodes record the entry-script SHA; nested core hashes are checked against the read-only observer at analysis time, not claimed as retroactive per-task module attestations.",
+    "Point count and nearest surface distances are responses of this fixed component, not geometric truth, true correspondences, heldout accuracy or optimal parameter recommendations.",
+    "The difference of count differences is descriptive for one object; no independent repetitions or statistical uncertainty.",
+    "All 114 frames enter all surfaces; the remaining 222 saved records are excluded. No whole failed-scan repair or automatic model promotion."
+  ],
+  "pinned_inputs": 312,
+  "current_core_python_tests": 221,
+  "readback": {
+    "checked_at_utc": "2026-10-26T00:32:44.393400+00:00",
+    "catalog_summary": {
+      "frames": 11932,
+      "observations": 370243304,
+      "projects": 33,
+      "models": 129
+    },
+    "jobs": 11,
+    "active_jobs": 0,
+    "experiment_label": "融合点来源 · 逐帧体素权重与零交叉",
+    "voxel_primary_url": "/reports/range2-study-20261018/experiments/tsdf-voxel-evidence-20261026/review.html",
+    "factorial_url": "/reports/range2-study-20261018/experiments/tsdf-voxel-evidence-20261026/factorial/review.html",
+    "controller_checks": [
+      {
+        "actual_generated_controller_simulated_dom_svg": true,
+        "cases": 4,
+        "selected_edges": 64,
+        "edge_snapshot_checks": 7360,
+        "strict_weight_gate_and_sign_verified": true,
+        "original_frame_ids_retained": true,
+        "cross_grid_query_location_retained": true,
+        "local_report_links_exist": true,
+        "served_http_matches_disk": true,
+        "actual_browser_gpu": false
+      },
+      {
+        "actual_generated_factorial_controller_simulated_dom": true,
+        "one_parameter_comparisons": 8,
+        "shared_viewer_pages": 8,
+        "embedded_scripts_parse": 32,
+        "preview_original_points_verified": 761996,
+        "source_payloads_per_arm": 229,
+        "same_applied_poses": true,
+        "served_http_matches_disk": true,
+        "actual_browser_gpu": false
+      }
+    ],
+    "persistent_states": {
+      "frame-drafts": {
+        "sha256": "f6751962cc98d07ac9366ae9fdb73dbab34f5fbd46cb5fd609c3f69ba5396032",
+        "snapshots": 2
+      },
+      "landmark-drafts": {
+        "sha256": "672ae36ee1d2e5d9c09e47316b5ccaf4cba0fe9b49ac7cf96933f57b8e265e75",
+        "snapshots": 2
+      },
+      "project-history": {
+        "sha256": "d491a08af198af98be092fd3df31bb7b3842f7e577073955a101e2984cd20350",
+        "snapshots": 4
+      }
+    }
+  },
+  "cpu_viewer": {
+    "saved": {
+      "actual_shared_viewer_cpu": true,
+      "shared_camera_bounds": [
+        [
+          -20.18111801147461,
+          -124,
+          371.5090637207031
+        ],
+        [
+          69.00000762939453,
+          -12.64505672454834,
+          482.4000244140625
+        ]
+      ],
+      "panes": [
+        {
+          "display_points": 57433,
+          "visible_pixels": 48458,
+          "original_ids_preserved": true,
+          "camera": {
+            "target": [
+              24.40944480895996,
+              -68.32252836227417,
+              426.9545440673828
+            ],
+            "radius": 90.34655738591775,
+            "distance": 262.00501641916145
+          }
+        },
+        {
+          "display_points": 37663,
+          "visible_pixels": 48309,
+          "original_ids_preserved": true,
+          "camera": {
+            "target": [
+              24.40944480895996,
+              -68.32252836227417,
+              426.9545440673828
+            ],
+            "radius": 90.34655738591775,
+            "distance": 262.00501641916145
+          }
+        }
+      ],
+      "actual_browser_gpu": false
+    },
+    "corrected": {
+      "actual_shared_viewer_cpu": true,
+      "shared_camera_bounds": [
+        [
+          -19.80000114440918,
+          -124,
+          371.29693603515625
+        ],
+        [
+          69.00000762939453,
+          -13.829756736755371,
+          482.8752136230469
+        ]
+      ],
+      "panes": [
+        {
+          "display_points": 58112,
+          "visible_pixels": 47852,
+          "original_ids_preserved": true,
+          "camera": {
+            "target": [
+              24.600003242492676,
+              -68.91487836837769,
+              427.08607482910156
+            ],
+            "radius": 90.10082697787863,
+            "distance": 261.292398235848
+          }
+        },
+        {
+          "display_points": 37088,
+          "visible_pixels": 47570,
+          "original_ids_preserved": true,
+          "camera": {
+            "target": [
+              24.600003242492676,
+              -68.91487836837769,
+              427.08607482910156
+            ],
+            "radius": 90.10082697787863,
+            "distance": 261.292398235848
+          }
+        }
+      ],
+      "actual_browser_gpu": false
+    }
+  },
+  "source_integrity": {
+    "projects": 29,
+    "required_source_files": 388,
+    "source_bytes_read": 3031514347,
+    "all_required_source_files_match": true,
+    "source_files_never_written": true
+  },
+  "code_sha256": {
+    "scripts/analyze_tsdf_parameter_factorial.py": "3b9afa8729fd12ae38a0b60c6b4ddb90dc1bbefa5c15242ea46a986f51cb61d0",
+    "web/studio/tsdf_parameter_factorial.html": "b89ebe3859d33a18f34d2c9002b3262b1cdd88a2257868ff1808816411ed1341",
+    "tests/check_tsdf_factorial.cjs": "db8c25de0126edf45490236f25e73bb1f0c102d0fd9630102cdbf1a9e36deae7",
+    "tests/render_comparison_cpu.cjs": "85fa49e4f07a51fe7ba23ca7867f4daa02f49489d5d3d61367dbbe5853341aaf",
+    "src/reconstruction_probe/fusion_settings.py": "2636bd03928453bd71670c423536d7dbc74415b5d73ce77b4884d26b6f6d11c0",
+    "scripts/reconstruct_scans.py": "3709d7877063d8295f50635ea9183a9d3edeebf19d3dcc3ce11c55f7720b362b",
+    "src/reconstruction_probe/tensor_tsdf.py": "e9055229f5718845463a297f50ab7d123bca9d3714ece34ef4a0c803ff952d58"
+  },
+  "cpu_figure_sha256": "4dd3e59c7fef7e1c2f6636d51ca0060ac9bbedd3bc4eafb73058185b4eb9496f"
+}
