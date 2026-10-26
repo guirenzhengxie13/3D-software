@@ -13,6 +13,7 @@ import numpy as np
 from experiment_color_seeded_roi import optical_points
 from reconstruct_scans import optical_to_pose_axes, reconstruct, write_json
 from reconstruction_probe.fragment_plan import compile_fragment_plan, load_fragment_inputs
+from reconstruction_probe.fusion_settings import executed_fusion_settings
 from reconstruction_probe.multi_scan import FrameKey, rigid
 from reconstruction_probe.offline import file_sha256
 from reconstruction_probe.path_mapping import PathMapper
@@ -53,6 +54,8 @@ def main():
         evaluate_vendor=False,bounds_override_mm=bounds,tsdf_backend='tensor',tsdf_weight_threshold=settings['weight_threshold'],
         coordinate_frame='explicit_fragment_component_'+index['scan_id'],
         reconstruction_note='Explicit fragment plan: '+plan['decision']+('; saved-pose control' if args.saved_control else '; hierarchical corrections applied')+'. All selected depths now integrated, including earlier reserved records; this output is a demonstration, not heldout evaluation.')
+    effective=executed_fusion_settings(result)
+    if effective!=settings:raise ValueError('实际融合参数与已核验计划不一致')
     if selected_count!=len(original) or result['integrated_frames']!=len(original):raise ValueError('Selected fragment frames were not integrated exactly once')
     integrated_ids=[row['id'] for row in result['frames'] if row['status']=='integrated']
     if sorted(integrated_ids)!=compiled['selected_frame_ids']:raise ValueError('Integrated original frame IDs differ from the explicit plan')
@@ -60,7 +63,7 @@ def main():
         if file_sha256(Path(name))!=expected:raise ValueError('Pinned fusion input changed during integration: '+name)
     np.savez_compressed(out/'applied-poses.npz',**{f'pose_{rid}':matrix for rid,matrix in overrides.items()})
     summary=dict(status='explicit_fragment_component_candidate_not_promoted',scan_id=index['scan_id'],saved_control=args.saved_control,
-        decision=plan['decision'],fusion_parameters=settings,selected_frames=len(original),selected_frame_ids=compiled['selected_frame_ids'],
+        decision=plan['decision'],fusion_parameters=settings,effective_fusion_parameters=effective,selected_frames=len(original),selected_frame_ids=compiled['selected_frame_ids'],
         selected_depth_with_frame_ids_sha256=digest.hexdigest(),quality=result['quality'],
         corrections_by_fragment={str(key):value.tolist() for key,value in corrections.items()},
         frame_fragment_ids={str(key.frame_id):fragment for key,fragment in compiled['ownership'].items()},

@@ -15,6 +15,7 @@ import numpy as np
 import open3d as o3d
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from reconstruction_probe.fusion_settings import effective_truncation_mm
 from reconstruction_probe.sources import _read_ply_cloud
 from reconstruction_probe.offline import read_global_registration_poses, file_sha256
 from reconstruction_probe.poses import parse_compact_frame_pose, parse_frame_info_blob, _rigid_matrix
@@ -211,7 +212,7 @@ def reconstruct(decoded, out, voxel_mm=.6, truncation_mm=2.4, edge_threshold_mm=
         effective_voxel_mm = voxel_mm
     elif tsdf_backend != "uniform":
         raise ValueError("Unknown TSDF backend")
-    actual_truncation_mm = max(truncation_mm, effective_voxel_mm * 4)
+    actual_truncation_mm = effective_truncation_mm(truncation_mm,effective_voxel_mm,tsdf_backend)
     origin_mm = (lower + upper) / 2 - length_mm / 2
     # The installed Windows Open3D 0.20 scalable implementation returned an
     # empty surface even for a known flat-depth control. Uniform TSDF passes
@@ -318,6 +319,7 @@ def reconstruct(decoded, out, voxel_mm=.6, truncation_mm=2.4, edge_threshold_mm=
               "volume_resolution": resolution if tsdf_backend == "uniform" else None,
               "volume_cube_length_mm": length_mm if tsdf_backend == "uniform" else None,
               "volume_origin_mm": origin_mm.tolist() if tsdf_backend == "uniform" else [0.,0.,0.],
+              "requested_truncation_mm": truncation_mm,
               "sdf_truncation_mm": actual_truncation_mm,
               "volume_bounds_source": ("explicit_roi" if bounds_override_mm is not None else "sampled_saved_depth") if tsdf_backend == "uniform" else "active_sparse_blocks",
               "explicit_roi_bounds_mm": None if bounds_override_mm is None else np.asarray(bounds_override_mm).tolist(),

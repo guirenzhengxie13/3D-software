@@ -47,4 +47,5 @@ class TensorTSDFVolume:
         return {"active_blocks":self.grid.hashmap().size(),"block_resolution":16,
             "attribute_bytes_per_voxel":20,"device":"CPU:0",
             "active_attribute_bytes":self.grid.hashmap().size()*16**3*20,
+            "voxel_m":self.voxel_m,"truncation_voxel_multiplier":self.multiplier,
             "extraction_weight_threshold":self.weight_threshold,"maximum_active_blocks":self.maximum_active_blocks}

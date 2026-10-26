@@ -43,7 +43,7 @@ def main():
         if state['status']=='failed':raise SystemExit(1)
         return
     results=[read(out/'nodes'/label/'summary.json') for label in ['saved','corrected']]
-    if any(row.get('fusion_parameters')!=parameters for row in results):raise ValueError('Fusion arms differ from reviewed parameters')
+    if any(row.get('fusion_parameters')!=parameters or row.get('effective_fusion_parameters')!=parameters for row in results):raise ValueError('Fusion arms differ from reviewed parameters')
     for key in ['selected_frames','selected_frame_ids','selected_depth_with_frame_ids_sha256']:
         if results[0][key]!=results[1][key]:raise ValueError('Control and corrected arms used different original frames/pixels')
     if file_sha256(plan_path)!=args.plan_sha256:raise ValueError('Reviewed plan changed during fusion')
@@ -52,7 +52,7 @@ def main():
         plan['decision']+' 两组使用同一批原帧与原ROI像素；表面变化不单独证明物理精度改善。',
         '原帧重融合 · 控制组与校正组')
     summary=dict(status='reviewed_fragment_fusion_pair_candidate_not_promoted',scan_id=index['scan_id'],
-        fusion_parameters=parameters,selected_frames=results[0]['selected_frames'],same_original_frames_and_roi_pixels=True,
+        fusion_parameters=parameters,effective_fusion_parameters=parameters,selected_frames=results[0]['selected_frames'],same_original_frames_and_roi_pixels=True,
         selected_depth_with_frame_ids_sha256=results[0]['selected_depth_with_frame_ids_sha256'],
         reviewed_plan_sha256=args.plan_sha256,results=results,
         limitations=['Frame ownership and saved-coordinate basis came from the recorded form; no physical correspondence is inferred.',

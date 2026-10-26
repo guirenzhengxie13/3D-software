@@ -1,0 +1,51 @@
+{
+  "issue": "Tensor requests below four voxels were silently enlarged by the legacy uniform-grid floor",
+  "fixed_policy": "Tensor honors supported requested truncation; uniform behavior retained",
+  "unaffected_previous_defaults": "0.6/2.4mm and 0.8/3.2mm both used four voxels",
+  "live_job": "9d10fd888e3b4e7d",
+  "review_id": "4eb0eb4536254225",
+  "source_job": "8197aff465a34cf7",
+  "selected_frames": 114,
+  "pixel_sha256": "5c899c637d54df68f358d9bcdb597689ce32b97a08f0d2031de2cd8a8e621736",
+  "arms": [
+    {
+      "arm": "saved",
+      "points": 37620,
+      "requested_truncation_mm": 1.6,
+      "effective_parameters": {
+        "voxel_mm": 0.8,
+        "truncation_mm": 1.6,
+        "edge_threshold_mm": 3.0,
+        "weight_threshold": 3.0
+      },
+      "volume_multiplier": 2.0,
+      "reconstruction_report_sha256": "c6cf6a26d52646f8091b99ec33beedfc12ec324eba253cc12a53bf57f4926a54"
+    },
+    {
+      "arm": "corrected",
+      "points": 37124,
+      "requested_truncation_mm": 1.6,
+      "effective_parameters": {
+        "voxel_mm": 0.8,
+        "truncation_mm": 1.6,
+        "edge_threshold_mm": 3.0,
+        "weight_threshold": 3.0
+      },
+      "volume_multiplier": 2.0,
+      "reconstruction_report_sha256": "d3e2bfdbd4fd045f1694a4a73732d6aa889dbbd01e6455c504b2fd774ab3c616"
+    }
+  ],
+  "final_report_cross_check": true,
+  "python_tests": 221,
+  "code_sha256": {
+    "src/reconstruction_probe/fusion_settings.py": "2636bd03928453bd71670c423536d7dbc74415b5d73ce77b4884d26b6f6d11c0",
+    "src/reconstruction_probe/tensor_tsdf.py": "e9055229f5718845463a297f50ab7d123bca9d3714ece34ef4a0c803ff952d58",
+    "src/reconstruction_probe/tsdf_trace.py": "3b28249c48f09334d220fa3fd514767b23fcdae40cc4349e87e56dfeea245c6e",
+    "scripts/reconstruct_scans.py": "3709d7877063d8295f50635ea9183a9d3edeebf19d3dcc3ce11c55f7720b362b",
+    "scripts/reconstruct_fragment_plan.py": "07f220446761f4697b067b0cbfd3bd52f0ae2e56533f5a3ca66163f121d22b94",
+    "scripts/run_fragment_fusion_pair.py": "f95f1c7988930eae11eaa84667a78f7b5bdc56d05e5aaa4145bebba3269f3054",
+    "scripts/run_frozen_parameter_control.py": "bedbac69a9abe635a39b402a0749aac0416290cac86397332c335e20f2c9b48e",
+    "tests/test_effective_fusion_settings.py": "8450f8eb263effaa24ac113d9e45202239704e32c3bb6daa71efe92997fe3190",
+    "tests/test_tsdf_trace.py": "0d212515338ce8bbf1a663d30501d9e914d8964aeb4ba34bdc31a5676792faa4"
+  }
+}

@@ -1,4 +1,4 @@
-"""Replay a completed pinned frame binding with default fusion settings.
+"""Replay a completed pinned frame binding with explicit or default fusion settings.
 
 Creates a fresh review and task, never reuses a submitted execution token or
 creates editing drafts. Resume uses the same recorded review/job IDs.
@@ -17,7 +17,9 @@ from reconstruction_probe.web_fragments import expression
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--port',type=int,default=8877);p.add_argument('--from-job',required=True);p.add_argument('--out',required=True);p.add_argument('--resume',action='store_true');args=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--port',type=int,default=8877);p.add_argument('--from-job',required=True);p.add_argument('--out',required=True);p.add_argument('--resume',action='store_true');
+    for key in ['voxel-mm','truncation-mm','edge-threshold-mm','weight-threshold']:p.add_argument('--'+key,type=float)
+    args=p.parse_args()
     root=Path(__file__).resolve().parents[1];mapper=PathMapper(root);out=mapper.resolve_output(args.out)
     if root/'reports' not in out.parents or (out.exists() and not args.resume):p.error('Use a new local reports folder or explicitly resume')
     out.mkdir(parents=True,exist_ok=args.resume)
@@ -35,7 +37,7 @@ def main():
     if file_sha256(folder/'binding.json')!=original['binding_sha256']:raise ValueError('Source binding changed')
     context=api('/api/fragments/context?scan='+source['scan_id']);alignment=next((a for a in context['alignments'] if a['id']==original['alignment_id']),None)
     if alignment is None or alignment['sha256']!=binding['alignment_summary_sha256'] or context['index_sha256']!=binding['decoded_index_sha256']:raise ValueError('Source index or alignment revision changed')
-    settings=fusion_settings();request=dict(scan_id=source['scan_id'],index_sha256=context['index_sha256'],alignment_id=alignment['id'],alignment_sha256=alignment['sha256'],candidate=original['candidate'],mode='frame_id',source_frames=expression(binding['source']['frame_ids']),target_frames=expression(binding['target']['frame_ids']),source_basis=binding['source']['basis'],target_basis=binding['target']['basis'],decision='Automated default-parameter control of pinned task '+args.from_job+'; not new human correspondence approval.',coordinate_confirmed=True,roi=binding.get('selection_roi_original_scan_mm'),fusion_parameters=settings)
+    settings=fusion_settings();settings.update({key:getattr(args,key) for key in settings if getattr(args,key) is not None});settings=fusion_settings(settings);request=dict(scan_id=source['scan_id'],index_sha256=context['index_sha256'],alignment_id=alignment['id'],alignment_sha256=alignment['sha256'],candidate=original['candidate'],mode='frame_id',source_frames=expression(binding['source']['frame_ids']),target_frames=expression(binding['target']['frame_ids']),source_basis=binding['source']['basis'],target_basis=binding['target']['basis'],decision=('Automated default-parameter control of pinned task ' if settings==fusion_settings() else 'Automated explicit-parameter control of pinned task ')+args.from_job+'; not new human correspondence approval.',coordinate_confirmed=True,roi=binding.get('selection_roi_original_scan_mm'),fusion_parameters=settings)
     if (out/'request.json').exists():
         if read('request.json')!=request:raise ValueError('Replay arguments differ from the existing journal')
     else:save('request.json',request)
