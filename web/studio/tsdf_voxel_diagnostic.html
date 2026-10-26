@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>一个融合点是怎样产生的？</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#101824;color:#e1eaf5}body{max-width:1200px;margin:auto;padding:24px}h1{font-size:28px}h2{font-size:19px}p{line-height:1.75}a{color:#8ed8ee}small,.muted{color:#acc0d7}.notice{border-left:4px solid #f0bb74;background:#293245;padding:12px 16px}.panel{background:#192638;border:1px solid #30465f;border-radius:9px;padding:18px;margin:20px 0}label{display:inline-block;margin:0 16px 14px 0}select,button{font:inherit;padding:9px;color:inherit;background:#24374e;border:1px solid #667e99;border-radius:5px;max-width:100%}button{cursor:pointer}button:disabled{opacity:.4;cursor:default}.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}input[type=range]{flex:1;min-width:180px;accent-color:#93bcff}output{font-variant-numeric:tabular-nums}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.card{padding:12px;background:#23344a;border-radius:6px}.card strong{font-size:23px;display:block;margin-top:6px}svg{display:block;width:100%;height:auto;min-width:500px;background:#142132;border-radius:5px}.scroll{overflow:auto}.columns{display:grid;grid-template-columns:1fr 1fr;gap:20px}.blue{color:#82c3ff}.gold{color:#f5be73}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.65}table{border-collapse:collapse;width:100%}td,th{padding:10px;text-align:left;border-bottom:1px solid #3a4e68}.pass{color:#84dbb5}.fail{color:#f6b0a4}#gate{font-size:18px;font-weight:600}details>summary{cursor:pointer}@media(max-width:720px){body{padding:14px}.cards,.columns{grid-template-columns:1fr 1fr}.columns>div{grid-column:1/-1}}
+</style>
+<h1>一个融合点是怎样产生的？</h1>
+<p>从原保存深度重新融合，读取实际体素的累计值。沿着相邻两个体素之间的边，查看“符号相反”与“两个权重都超过门槛”何时同时成立。</p>
+<p class="notice" id="scope">同一失败杯子的114条保存记录；四次完整回放都复现参考点集。下方是每步积分后的实际体素状态；“可提取”按提取条件计算，没有逐步保存完整表面。全部帧参与融合，未增加独立真值，整份336帧扫描仍未修复。</p>
+<div class="cards"><div class="card">当前体素 / 截断<strong id="settings"></strong></div><div class="card">完整回放点数<strong id="points"></strong></div><div class="card">同参考点集双向最大距离<strong id="reproduction"></strong></div><div class="card">积分记录 / 查询体素<strong id="queries"></strong></div></div>
+<section class="panel">
+<label>回放配置 <select id="case"></select></label><label>检查位置 <select id="target"></select></label><button id="peer">切到另一组体素</button>
+<p id="location" class="muted"></p><label>局部晶格边 <select id="edge"></select></label>
+<div class="controls"><button id="previous">上一条</button><input id="step" type="range" min="0" max="114" value="114" aria-label="积分到第几条保存记录"><button id="next">下一条</button><output id="position"></output></div>
+<p id="gate"></p><div class="scroll"><svg id="lattice" viewBox="0 0 920 140" role="img" aria-label="相邻两个体素的状态"></svg></div>
+<div class="scroll"><table><thead><tr><th>端点</th><th>整数晶格坐标</th><th>当前TSDF</th><th>当前累计权重</th><th>是否超过门槛</th></tr></thead><tbody id="rows"></tbody></table></div>
+<p id="interpolation" class="muted"></p>
+</section>
+<section class="panel"><h2>随着保存记录进入融合，数值怎样变化？</h2><p><span class="blue">蓝色：起点A</span> · <span class="gold">金色：终点B</span>。虚线为权重门槛或TSDF零值；竖线是当前积分步骤。未分配体素不画成零测量；已分配但权重为0时，TSDF曲线也留空。</p><div class="scroll"><svg id="weights" viewBox="0 0 920 235" role="img" aria-label="累计权重曲线"></svg></div><div class="scroll"><svg id="tsdf" viewBox="0 0 920 235" role="img" aria-label="TSDF曲线"></svg></div></section>
+<section class="panel"><h2>这个位置在最终表面上为何出现或消失？</h2><p id="neighborhood"></p><p id="explanation"></p><div class="columns"><div><h2 class="blue">起点A的实际更新帧</h2><pre id="contributorsA"></pre></div><div><h2 class="gold">终点B的实际更新帧</h2><pre id="contributorsB"></pre></div></div></section>
+<details class="panel"><summary>读数范围与验证方式</summary><p>权重是某个体素实际被更新的次数，不是独立视角数或物理置信度；把最终表面点投回原深度得到的支持次数，查询位置与像素取样也不同，不能直接当体素权重。邻域为4×4×4晶格位置，仅有144条轴向边。跨体素配置选中的是附近边，不代表同一真实表面对应。</p><p>零交叉的插值位置可复现输出，微小数值距离说明实现复现，不能当扫描物理误差。只读观察器继承实际融合适配器；每次正常积分后读取网格，不写入TSDF/权重。四次最终完整点集均与固定参考双向核对。</p><p>本机Open3D 0.20.0 CPU，实际严格权重条件已用原生网格测试验证；参考<a href="https://github.com/isl-org/Open3D/blob/v0.20.0/cpp/open3d/t/geometry/kernel/VoxelBlockGridImpl.h">官方0.20.0内核</a>。版本标签不等于已安装二进制的源码构建证明。本页无需WebGL；未新增Chrome/GPU实机验证。</p><pre id="provenance"></pre></details>
+<p><a href="../fusion-setting-response-20261025/tail-verified/review.html">查看对应位置的三维局部点云与原深度回查</a> · <a href="summary.json">完整体素记录与输入SHA</a> · <a href="presentation.json">展示校验清单</a> · <a href="/">回到工作台</a></p>
+<script id="voxel-data" type="application/json">__VOXEL_DATA__</script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),raw=$('voxel-data').textContent;
+if(raw.trim()==='__VOXEL_DATA__'){$('scope').textContent='这是开发模板，请从工作台的实验与证据打开带数据的生成页面。';return;}
+const data=JSON.parse(raw),ns='http://www.w3.org/2000/svg',colors=['#82c3ff','#f5be73'];
+function node(tag,text){const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);return n;}
+function shape(tag,attributes,text){const n=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attributes))n.setAttribute(k,String(v));if(text!==undefined)n.textContent=String(text);return n;}
+function options(id,rows){$(id).replaceChildren();for(const [value,label] of rows){const n=node('option',label);n.value=String(value);$(id).append(n);}}
+const caseLabel=c=>(c.case.endsWith('saved')?'原保存位姿':'片段校正位姿')+' · '+c.settings.voxel_mm+'mm体素';
+options('case',data.cases.map((c,i)=>[i,caseLabel(c)]));$('case').value='0';
+const current=()=>data.cases[Number($('case').value)],target=()=>current().targets[Number($('target').value)],edge=()=>target().edges[Number($('edge').value)];
+function resetTargets(){const variant=$('target').value?targetVariant:null,c=current();options('target',c.targets.map((t,i)=>[i,(t.reference_variant==='coarse'?'粗网格':'细网格')+'参考点 #'+t.reference_vertex_id]));$('target').value=String(Math.max(0,c.targets.findIndex(t=>t.reference_variant===(variant||'coarse'))));resetEdges();}
+let targetVariant='coarse';
+function resetEdges(){const t=target();targetVariant=t.reference_variant;options('edge',t.edges.map((e,i)=>[i,'XYZ'[e.axis]+'方向 '+e.start.join(',')+' → '+e.end.join(',')+(i<t.exact_lattice_candidates?' · 参考点所在边':' · 邻域边')]));$('edge').value='0';$('step').value=String(current().observed_frames);render();}
+function chart(id,key,title,min,max,threshold,selected){const box=$(id),rows=edge().timeline,w=920,h=235,left=60,right=20,top=32,bottom=35,pw=w-left-right,ph=h-top-bottom,x=n=>left+n/(rows.length-1)*pw,y=v=>top+(max-v)/(max-min)*ph;box.replaceChildren(shape('text',{x:16,y:21,fill:'#d9e6f5','font-size':14},title));
+for(let i=0;i<=4;i++){const val=min+(max-min)*i/4,py=y(val);box.append(shape('line',{x1:left,y1:py,x2:w-right,y2:py,stroke:'#30465f'}),shape('text',{x:left-8,y:py+4,fill:'#abc0d7','text-anchor':'end','font-size':12},val.toFixed(key==='weights'?0:2)));}
+box.append(shape('line',{x1:left,y1:y(threshold),x2:w-right,y2:y(threshold),stroke:'#c6d0dd','stroke-dasharray':'5 5'}));
+for(let endpoint=0;endpoint<2;endpoint++){let d='',started=false;for(const row of rows){const value=row[key][endpoint];if(value===null||!row.allocated||(key==='tsdf'&&row.weights[endpoint]===0)){started=false;continue;}d+=(started?' L':' M')+x(row.step).toFixed(2)+' '+y(value).toFixed(2);started=true;}box.append(shape('path',{d,fill:'none',stroke:colors[endpoint],'stroke-width':2}));}
+box.append(shape('line',{x1:x(selected),y1:top,x2:x(selected),y2:h-bottom,stroke:'#e7eef7','stroke-width':1}));for(const n of [0,Math.floor((rows.length-1)/2),rows.length-1])box.append(shape('text',{x:x(n),y:h-12,fill:'#abc0d7','text-anchor':'middle','font-size':12},n));}
+const format=v=>v===null?'未分配':Number(v).toFixed(6);
+function render(){const c=current(),t=target(),e=edge(),step=Math.max(0,Math.min(c.observed_frames,Number($('step').value)||0)),row=e.timeline[step],threshold=c.settings.weight_threshold;$('step').value=String(step);$('step').max=String(c.observed_frames);$('previous').disabled=step===0;$('next').disabled=step===c.observed_frames;
+$('settings').textContent=c.settings.voxel_mm+' / '+c.settings.truncation_mm+' mm';$('points').textContent=c.replay_points.toLocaleString();$('reproduction').textContent=c.full_pointset_bidirectional_max_mm+' mm';$('queries').textContent=c.observed_frames+' / '+c.queried_voxels;
+$('position').textContent=step===0?'初始 · 尚未积分':step+' / '+c.observed_frames+' · 原帧ID '+row.frame_id;
+$('location').textContent='参考坐标 ['+t.reference_mm.map(v=>v.toFixed(4)).join(', ')+'] mm；'+(t.exact_lattice_candidates?'本配置包含参考点所在晶格边。':'参考点不在本配置的晶格边上，以下检查附近边。');
+$('gate').className=row.point_extractable?'pass':'fail';$('gate').textContent=(row.point_extractable?'按当前状态可提取':'按当前状态不可提取')+'：'+(row.allocated?'已分配':'未分配')+'；'+(row.opposite_sign?'两端异号':'两端未异号')+'；'+(row.strict_weight_gate?'两端权重都 > ':'至少一端权重不大于 ')+threshold+'。';
+$('rows').replaceChildren();for(let j=0;j<2;j++){const tr=node('tr');for(const text of [j?'B 终点':'A 起点',e[j?'end':'start'].join(', '),format(row.tsdf[j]),row.weights[j],row.weights[j]>threshold?'通过':'未通过'])tr.append(node('td',text));$('rows').append(tr);}
+const diagram=$('lattice');diagram.replaceChildren(shape('line',{x1:190,y1:70,x2:730,y2:70,stroke:'#6b829e','stroke-width':3}));for(let j=0;j<2;j++)diagram.append(shape('circle',{cx:j?730:190,cy:70,r:10,fill:colors[j]}),shape('text',{x:j?730:190,y:38,fill:colors[j],'text-anchor':'middle'},(j?'B':'A')+' · TSDF '+format(row.tsdf[j])),shape('text',{x:j?730:190,y:112,fill:colors[j],'text-anchor':'middle'},'累计权重 '+row.weights[j]));
+if(row.opposite_sign){const ratio=-row.tsdf[0]/(row.tsdf[1]-row.tsdf[0]);diagram.append(shape('circle',{cx:190+540*ratio,cy:70,r:7,fill:row.point_extractable?'#84dbb5':'#ed9c93'}));}
+$('interpolation').textContent=e.predicted_mm?'最终这条边的零交叉位置 ['+e.predicted_mm.map(v=>v.toFixed(6)).join(', ')+'] mm；离参考点 '+e.distance_to_reference_mm.toPrecision(5)+' mm。'+(e.point_extractable?'最终满足出点条件。':'最终未通过出点门槛，此位置仅为可能的插值位置。'):'最终没有可计算的异号零交叉。';
+const maxWeight=Math.max(threshold+1,...e.timeline.flatMap(r=>r.weights));chart('weights','weights','累计更新权重',0,maxWeight*1.08,threshold,step);chart('tsdf','tsdf','归一化TSDF（不是毫米距离）',-1.05,1.05,0,step);
+const count=t.local_counts;$('neighborhood').textContent='最终局部 '+count.local_edges+' 条边：'+count.opposite_sign+' 条异号；'+count.extractable+' 条通过全部出点条件；'+count.opposite_but_weight_rejected+' 条虽异号但权重不足。';
+$('explanation').textContent=count.opposite_sign>0&&count.extractable===0?'这个局部邻域有零交叉，但权重条件全部阻止出点；这能解释当前局部表面缺失。不能据此判断哪一组更接近真实物体。':'出点由异号与两端权重共同决定；观察次数、表面点数和跨表面距离分别描述不同事情。';
+for(let j=0;j<2;j++)$('contributors'+(j?'B':'A')).textContent='最终 '+e.contributors[j].updates+' 次更新；当前已完成 '+row.weights[j]+' 次。\n原保存帧ID：'+e.contributors[j].frame_ids.join(', ');
+$('provenance').textContent='原ROI像素SHA256：'+c.original_pixel_sha256+'\n参考任务：'+c.reference_job+'\n只读观察器修改网格：否\n本页读取固定记录，拖动不会重新积分。';}
+$('case').onchange=resetTargets;$('target').onchange=resetEdges;$('edge').onchange=()=>{$('step').value=String(current().observed_frames);render();};$('step').oninput=render;$('previous').onclick=()=>{$('step').value=String(Number($('step').value)-1);render();};$('next').onclick=()=>{$('step').value=String(Number($('step').value)+1);render();};$('peer').onclick=()=>{const name=current().case,other=name.startsWith('coarse')?name.replace('coarse','fine'):name.replace('fine','coarse');$('case').value=String(data.cases.findIndex(c=>c.case===other));resetTargets();};resetTargets();
+})();
+</script></html>
